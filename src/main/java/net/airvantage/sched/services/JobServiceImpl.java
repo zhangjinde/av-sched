@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import net.airvantage.sched.app.AppException;
-import net.airvantage.sched.dao.JobDefDao;
+import net.airvantage.sched.dao.JobStateDao;
+import net.airvantage.sched.model.JobDef;
+import net.airvantage.sched.model.JobSchedulingDef;
 import net.airvantage.sched.model.JobSchedulingType;
-import net.airvantage.sched.model.jobDef.JobDef;
-import net.airvantage.sched.model.jobDef.JobSchedulingDef;
 import net.airvantage.sched.quartz.PostHttpJob;
 
 import org.apache.log4j.Logger;
@@ -26,9 +26,9 @@ public class JobServiceImpl implements JobService {
 
     private Scheduler scheduler;
 
-    private JobDefDao jobDefDao;
+    private JobStateDao jobDefDao;
 
-    public JobServiceImpl(final Scheduler scheduler, final JobDefDao jobDefDao) {
+    public JobServiceImpl(final Scheduler scheduler, final JobStateDao jobDefDao) {
         this.scheduler = scheduler;
         this.jobDefDao = jobDefDao;
     }

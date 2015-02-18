@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import net.airvantage.sched.app.AppException;
-import net.airvantage.sched.model.jobDef.JobDef;
+import net.airvantage.sched.model.JobDef;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 

@@ -1,9 +1,10 @@
 package net.airvantage.sched.services;
 
+import net.airvantage.sched.TestUtils;
 import net.airvantage.sched.app.AppException;
+import net.airvantage.sched.model.JobDef;
+import net.airvantage.sched.model.JobSchedulingDef;
 import net.airvantage.sched.model.JobSchedulingType;
-import net.airvantage.sched.model.jobDef.JobDef;
-import net.airvantage.sched.model.jobDef.JobSchedulingDef;
 import net.airvantage.sched.services.JobServiceImpl;
 
 import org.junit.Test;
@@ -19,7 +20,7 @@ public class JobServiceImplTest {
 
     @Test
     public void testCanGetSchedulingFromCronJobDef() throws Exception {
-        JobSchedulingDef schedDef = cronJobSchedulingDef();
+        JobSchedulingDef schedDef = TestUtils.cronJobSchedulingDef();
         ScheduleBuilder<? extends Trigger> builder = JobServiceImpl.scheduleBuilder(schedDef);
         assertThat(builder).isInstanceOf(CronScheduleBuilder.class);
     }
@@ -40,7 +41,7 @@ public class JobServiceImplTest {
     
     @Test
     public void testCreatesTriggerFromDef() throws Exception {
-        Trigger trigger = JobServiceImpl.jobDefToTrigger(cronJobDef());
+        Trigger trigger = JobServiceImpl.jobDefToTrigger(TestUtils.cronJobDef("av-server/timers"));
         assertThat(trigger).isInstanceOf(CronTrigger.class);
     }
     
@@ -48,20 +49,6 @@ public class JobServiceImplTest {
     
     // TODO(pht) maybe, just one change detector test ?
     
-    private JobDef cronJobDef() {
-        JobDef jobDef = new JobDef();
-        jobDef.setId("av-server/timer");
-        jobDef.setUrl("http://test/api/test");
-        jobDef.setScheduling(cronJobSchedulingDef());
-        return jobDef;
-    }
-    
-    private JobSchedulingDef cronJobSchedulingDef() {
-        JobSchedulingDef schedDef = new JobSchedulingDef();
-        schedDef.setType(JobSchedulingType.CRON);
-        schedDef.setValue("0 0 6 1 1/12 ? *");
-        schedDef.setTimeout(5000);
-        return schedDef;
-    }
+   
    
 }

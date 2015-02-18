@@ -16,7 +16,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
 import net.airvantage.sched.app.mapper.JobDefMapper;
-import net.airvantage.sched.model.jobDef.JobDef;
+import net.airvantage.sched.model.JobDef;
 import net.airvantage.sched.services.JobService;
 
 public class JobsServlet extends HttpServlet {

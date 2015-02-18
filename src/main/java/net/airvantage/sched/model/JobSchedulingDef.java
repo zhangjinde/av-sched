@@ -1,6 +1,5 @@
-package net.airvantage.sched.model.jobDef;
+package net.airvantage.sched.model;
 
-import net.airvantage.sched.model.JobSchedulingType;
 
 public class JobSchedulingDef {
     

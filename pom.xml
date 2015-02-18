@@ -72,6 +72,12 @@
 			<version>3.1.0</version>
 		</dependency>
 
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.4</version>
+		</dependency>
+
 		<!-- Embedded jetty for quick webapp launch during development -->
 		<dependency>
 			<groupId>org.eclipse.jetty</groupId>

@@ -1,4 +1,4 @@
-package net.airvantage.sched.model.jobDef;
+package net.airvantage.sched.model;
 
 public class JobDef {
 

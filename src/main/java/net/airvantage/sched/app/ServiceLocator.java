@@ -1,35 +1,39 @@
 package net.airvantage.sched.app;
 
+import net.airvantage.sched.dao.DummyJobStateDao;
+import net.airvantage.sched.dao.JobStateDao;
+import net.airvantage.sched.dao.JobStateDaoImpl;
+import net.airvantage.sched.services.JobService;
+import net.airvantage.sched.services.JobServiceImpl;
+
+import org.apache.http.client.HttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.SchedulerFactory;
 
-import net.airvantage.sched.dao.JobDefDao;
-import net.airvantage.sched.dao.JobDefDaoImpl;
-import net.airvantage.sched.services.JobService;
-import net.airvantage.sched.services.JobServiceImpl;
-
 public class ServiceLocator {
 
     private static JobService jobService;
-    private static JobDefDao jobDefDao;
+    private static JobStateDao jobStateDao;
     private static Scheduler scheduler;
     
     public static JobService getJobService() throws SchedulerException {
         if (jobService == null) {
-            jobService = new JobServiceImpl(getScheduler(), getJobDefDao());
+            jobService = new JobServiceImpl(getScheduler(), getJobStateDao());
         }
         return jobService;
     }
 
-    private static JobDefDao getJobDefDao() {
-        if (jobDefDao == null) {
-            jobDefDao = new JobDefDaoImpl();
+    public static JobStateDao getJobStateDao() {
+        if (jobStateDao == null) {
+            // jobStateDao = new JobStateDaoImpl();
+            jobStateDao = new DummyJobStateDao();
         }
-        return jobDefDao;
+        return jobStateDao;
     }
 
-    private static Scheduler getScheduler() throws SchedulerException {
+    public static Scheduler getScheduler() throws SchedulerException {
         if (scheduler == null) {
             SchedulerFactory schedFact = new org.quartz.impl.StdSchedulerFactory();
             scheduler = schedFact.getScheduler();
@@ -38,4 +42,8 @@ public class ServiceLocator {
         return scheduler;
     }
     
+    public static HttpClient getHttpClient() {
+        // TODO(pht) Is it safe to reuse the same httpClient everytime ?
+        return HttpClients.createDefault();
+    }
 }
