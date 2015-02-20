@@ -20,15 +20,6 @@ A template exist in the "conf" folder.
 
 - `av-sched.port` : 8086 by default.
 
-### Security
-
-All api calls to `av-sched` should contain the header `X-Sched-secret`, with the value of
-the `av-sched.secret` parameter.
-
-The application that implements the task should also check that this header has the same value (and return a 401 otherwise.)
-
-Obviously, this secret should remain, *ahem*, [secret](http://uncyclopedia.wikia.com/wiki/Captain_Obvious).
-
 ## Usage
 
 ### From eclipse
@@ -38,6 +29,15 @@ Obviously, this secret should remain, *ahem*, [secret](http://uncyclopedia.wikia
 - Run `SchedMain`
 
 ## API
+
+## Security
+
+All api calls to `av-sched` should contain the header `X-Sched-secret`, with the value of
+the `av-sched.secret` parameter.
+
+The application that implements the task should also check that this header has the same value (and return a 401 otherwise.)
+
+Obviously, this secret should remain, *ahem*, [secret](http://uncyclopedia.wikia.com/wiki/Captain_Obvious).
 
 ### Schedule a job
 
