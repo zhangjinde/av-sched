@@ -40,7 +40,7 @@ public class JobDefServlet extends HttpServlet {
         JACKSON.enable(SerializationFeature.INDENT_OUTPUT);
         
         try {
-            jobService = ServiceLocator.getJobService();
+            jobService = ServiceLocator.getInstance().getJobService();
         } catch (SchedulerException e) {
             throw new ServletException("Unable to create jobService from ServiceLocator", e);
         }

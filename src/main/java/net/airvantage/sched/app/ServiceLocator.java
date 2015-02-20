@@ -1,8 +1,8 @@
 package net.airvantage.sched.app;
 
+import net.airvantage.sched.conf.ConfigurationManager;
 import net.airvantage.sched.dao.DummyJobStateDao;
 import net.airvantage.sched.dao.JobStateDao;
-import net.airvantage.sched.dao.JobStateDaoImpl;
 import net.airvantage.sched.quartz.LockTriggerListener;
 import net.airvantage.sched.services.JobService;
 import net.airvantage.sched.services.JobServiceImpl;
@@ -16,18 +16,41 @@ import org.quartz.TriggerListener;
 
 public class ServiceLocator {
 
-    private static JobService jobService;
-    private static JobStateDao jobStateDao;
-    private static Scheduler scheduler;
-    
-    public static JobService getJobService() throws SchedulerException {
+    // ---------- Singleton pattern ----------
+    // Do not use everywhere, only in things like quartz jobs & servlets.
+    private static ServiceLocator instance;
+
+    public static ServiceLocator getInstance() {
+        if (instance == null) {
+            instance = new ServiceLocator();
+        }
+        return instance;
+    }
+
+    // ---------- Singleton pattern ----------
+
+    private ConfigurationManager configManager;
+    private JobService jobService;
+    private JobStateDao jobStateDao;
+    private Scheduler scheduler;
+
+    public void init() {
+        instance = this;
+        configManager = new ConfigurationManager();
+    }
+
+    public JobService getJobService() throws SchedulerException {
         if (jobService == null) {
             jobService = new JobServiceImpl(getScheduler(), getJobStateDao());
         }
         return jobService;
     }
 
-    public static JobStateDao getJobStateDao() {
+    public ConfigurationManager getConfigManager() {
+        return configManager;
+    }
+
+    public JobStateDao getJobStateDao() {
         if (jobStateDao == null) {
             // jobStateDao = new JobStateDaoImpl();
             jobStateDao = new DummyJobStateDao();
@@ -35,7 +58,7 @@ public class ServiceLocator {
         return jobStateDao;
     }
 
-    public static Scheduler getScheduler() throws SchedulerException {
+    public Scheduler getScheduler() throws SchedulerException {
         if (scheduler == null) {
             SchedulerFactory schedFact = new org.quartz.impl.StdSchedulerFactory();
             scheduler = schedFact.getScheduler();
@@ -44,13 +67,21 @@ public class ServiceLocator {
         }
         return scheduler;
     }
-    
-    private static TriggerListener getLockTriggerListener() {
+
+    private TriggerListener getLockTriggerListener() {
         return new LockTriggerListener(getJobStateDao());
     }
 
-    public static HttpClient getHttpClient() {
+    public HttpClient getHttpClient() {
         // TODO(pht) Is it safe to reuse the same httpClient everytime ?
         return HttpClients.createDefault();
+    }
+
+    public String getSchedSecret() {
+        return getConfigManager().get().getString("av-sched.secret");
+    }
+
+    public int getPort() {
+        return getConfigManager().get().getInt("av-sched.port");
     }
 }

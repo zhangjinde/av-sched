@@ -24,15 +24,19 @@ public class PostHttpJob implements Job {
     
     private HttpClient http;
     private JobStateDao jobStateDao;
+    private String schedSecret;
+
     
     public PostHttpJob() {
-        this(ServiceLocator.getHttpClient(),
-                ServiceLocator.getJobStateDao());
+        this(ServiceLocator.getInstance().getHttpClient(),
+                ServiceLocator.getInstance().getJobStateDao(),
+                ServiceLocator.getInstance().getSchedSecret());
     }
     
-    protected PostHttpJob(HttpClient httpClient, JobStateDao jobStateDao) {
+    protected PostHttpJob(HttpClient httpClient, JobStateDao jobStateDao, String schedSecret) {
         this.http = httpClient;
         this.jobStateDao = jobStateDao;
+        this.schedSecret = schedSecret;
     }
     
     public void execute(JobExecutionContext context) throws JobExecutionException {
@@ -43,6 +47,7 @@ public class PostHttpJob implements Job {
     protected void doJob(String jobId) throws JobExecutionException {
         JobState jobState = this.jobStateDao.findJobState(jobId);
         HttpPost request = new HttpPost(jobState.getUrl());
+        request.setHeader("X-Sched-secret", schedSecret);
         try {
             HttpResponse response = this.http.execute(request);
             if (response.getStatusLine().getStatusCode() == 200) {

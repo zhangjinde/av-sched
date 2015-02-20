@@ -15,12 +15,15 @@ public class SchedMain {
     
     public static void main(String[] args) throws Exception {
 
+        ServiceLocator.getInstance().init();
+        
         long start = System.currentTimeMillis();
         JobDefServlet.startupTime = start;
 
         URLClassLoader cl = (URLClassLoader) Thread.currentThread().getContextClassLoader();
 
-        int port = 8086;
+        int port = ServiceLocator.getInstance().getPort();
+        
         Server server = new Server(port);
         WebAppContext context = new WebAppContext();
         context.setDescriptor("src/main/webapp/WEB-INF/web.xml");

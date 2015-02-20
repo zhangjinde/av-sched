@@ -31,7 +31,7 @@ public class JobActionServlet extends HttpServlet {
         super.init();
         
         try {
-            jobService = ServiceLocator.getJobService();
+            jobService = ServiceLocator.getInstance().getJobService();
         } catch (SchedulerException e) {
             throw new ServletException(e);
         }
