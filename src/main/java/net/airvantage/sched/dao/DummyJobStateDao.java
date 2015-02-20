@@ -42,5 +42,17 @@ public class DummyJobStateDao implements JobStateDao {
         
         states.put(id, st);
     }
+    
+    @Override
+    public void unlockJob(String id) {
+     // TODO(pht) move to a "lock" method ?
+        JobState st = findJobState(id);
+        JobLock lock = new JobLock();
+        lock.setLocked(false);
+        lock.setExpiration(null);
+        st.setLock(lock);
+        
+        states.put(id, st);
+    }
 
 }

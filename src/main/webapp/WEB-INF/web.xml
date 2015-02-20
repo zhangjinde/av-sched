@@ -7,13 +7,23 @@
     
     
     <servlet>
-        <servlet-name>jobsServlet</servlet-name>
-        <servlet-class>net.airvantage.sched.app.JobsServlet</servlet-class>
+        <servlet-name>jobDefServlet</servlet-name>
+        <servlet-class>net.airvantage.sched.app.JobDefServlet</servlet-class>
+    </servlet>
+    
+    <servlet>
+        <servlet-name>jobActionServlet</servlet-name>
+        <servlet-class>net.airvantage.sched.app.JobActionServlet</servlet-class>
     </servlet>
     
     <servlet-mapping>
-        <servlet-name>jobsServlet</servlet-name>
+        <servlet-name>jobDefServlet</servlet-name>
         <url-pattern>/api/job</url-pattern>
+    </servlet-mapping>
+    
+    <servlet-mapping>
+        <servlet-name>jobActionServlet</servlet-name>
+        <url-pattern>/api/job/ack</url-pattern>
     </servlet-mapping>
     
 </web-app>

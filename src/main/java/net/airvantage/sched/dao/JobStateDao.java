@@ -10,4 +10,6 @@ public interface JobStateDao {
     public JobState findJobState(String id);
     
     public void lockJob(String id);
+    
+    public void unlockJob(String id);
 }

@@ -28,6 +28,12 @@ public class JobStateDaoImpl implements JobStateDao {
         LOG.debug("TODO(pht) Would try and get lock job with id " + id);
         
     }
+
+    @Override
+    public void unlockJob(String id) {
+        // TODO Auto-generated method stub
+        
+    }
     
 
 }

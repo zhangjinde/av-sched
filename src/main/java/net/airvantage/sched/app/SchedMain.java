@@ -16,7 +16,7 @@ public class SchedMain {
     public static void main(String[] args) throws Exception {
 
         long start = System.currentTimeMillis();
-        JobsServlet.startupTime = start;
+        JobDefServlet.startupTime = start;
 
         URLClassLoader cl = (URLClassLoader) Thread.currentThread().getContextClassLoader();
 
@@ -34,8 +34,8 @@ public class SchedMain {
         server.setHandler(context);
         server.start();
 
-        JobsServlet.startupDuration = System.currentTimeMillis() - start;
-        LOG.info("AV-SCHED started (startup duration: {} ms)", JobsServlet.startupDuration);
+        JobDefServlet.startupDuration = System.currentTimeMillis() - start;
+        LOG.info("AV-SCHED started (startup duration: {} ms)", JobDefServlet.startupDuration);
         
     }
     

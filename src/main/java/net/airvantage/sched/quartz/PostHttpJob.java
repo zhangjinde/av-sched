@@ -52,7 +52,7 @@ public class PostHttpJob implements Job {
                 LOG.error("TODO(pht) What do we want, again ?");
             }
         } catch (IOException e) {
-            LOG.error(e);
+            LOG.error("Unable to post to url", e);
             // TODO(pht) notify "logging" logical system
         }
     }

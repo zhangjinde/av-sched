@@ -9,60 +9,52 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import net.airvantage.sched.app.mapper.JsonMapper;
+import net.airvantage.sched.model.JobId;
+import net.airvantage.sched.services.JobService;
+
 import org.apache.log4j.Logger;
 import org.quartz.SchedulerException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 
-import net.airvantage.sched.app.mapper.JobDefMapper;
-import net.airvantage.sched.model.JobDef;
-import net.airvantage.sched.services.JobService;
+public class JobActionServlet extends HttpServlet {
 
-public class JobsServlet extends HttpServlet {
-
-    private static final long serialVersionUID = 1L;
-
-    private static final Logger LOG = Logger.getLogger(JobsServlet.class);
+    public static final Logger LOG = Logger.getLogger(JobActionServlet.class);
     
     private static final ObjectMapper JACKSON = new ObjectMapper();
-
-    public static long startupTime;
-    public static long startupDuration;
-
     
-    private JobService jobService = null;
-
+    private JobService jobService;
+    
     @Override
     public void init() throws ServletException {
         super.init();
-
-        JACKSON.enable(SerializationFeature.INDENT_OUTPUT);
         
         try {
             jobService = ServiceLocator.getJobService();
         } catch (SchedulerException e) {
-            throw new ServletException("Unable to create jobService from ServiceLocator", e);
+            throw new ServletException(e);
         }
-
     }
-
+    
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        if (req.getServletPath().endsWith("ack")) {
+            ackJob(req, resp);
+        }
+    }
+
+    protected void ackJob(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         Map<String, Object> res = new HashMap<String, Object>();
-        
         try {
-            JobDef jobDef = JobDefMapper.jobDef(req.getInputStream());
-            jobService.scheduleJob(jobDef);
-            // TODO(pht) or something better ?
-            res.put("id", jobDef.getId());
+            JobId jobId = JsonMapper.jobId(req.getInputStream());
+            jobService.ackJob(jobId.getId());
         } catch (AppException e) {
-            LOG.debug("Exception while scheduling job", e);
+            LOG.debug("Exception while acknowledging job", e);
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             res = e.asMap();
         }
         resp.setContentType("application/json");
         resp.getWriter().println(JACKSON.writeValueAsString(res));
     }
-
 }

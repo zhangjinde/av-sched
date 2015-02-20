@@ -14,6 +14,7 @@ import org.apache.log4j.Logger;
 import org.quartz.CronScheduleBuilder;
 import org.quartz.JobBuilder;
 import org.quartz.JobDetail;
+import org.quartz.JobKey;
 import org.quartz.ScheduleBuilder;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
@@ -26,11 +27,11 @@ public class JobServiceImpl implements JobService {
 
     private Scheduler scheduler;
 
-    private JobStateDao jobDefDao;
+    private JobStateDao jobStateDao;
 
-    public JobServiceImpl(final Scheduler scheduler, final JobStateDao jobDefDao) {
+    public JobServiceImpl(final Scheduler scheduler, final JobStateDao jobStateDao) {
         this.scheduler = scheduler;
-        this.jobDefDao = jobDefDao;
+        this.jobStateDao = jobStateDao;
     }
 
     @Override
@@ -40,6 +41,11 @@ public class JobServiceImpl implements JobService {
         saveJobDef(jobDef);
     }
 
+    @Override
+    public void ackJob(String jobId) throws AppException {
+        this.jobStateDao.unlockJob(jobId);
+    }
+    
     private void validateJobDef(JobDef jobDef) throws AppException {
         // TODO check id, etc...
         
@@ -49,6 +55,11 @@ public class JobServiceImpl implements JobService {
         JobDetail jobDetail = jobDefToJobDetail(jobDef);
         Trigger trigger = jobDefToTrigger(jobDef);
         try {
+            // Replace potentially existing job with the same key.
+            JobKey key = jobDetail.getKey();
+            if (this.scheduler.checkExists(key)) {
+                this.scheduler.deleteJob(key);
+            }
             this.scheduler.scheduleJob(jobDetail, trigger);
         } catch (SchedulerException e) {
             LOG.error("Unable to schedule job jobDef : " + jobDef.toString(), e);
@@ -64,6 +75,7 @@ public class JobServiceImpl implements JobService {
     protected static Trigger jobDefToTrigger(JobDef jobDef) throws AppException {
         Trigger trigger = TriggerBuilder.newTrigger().withIdentity(jobDef.getId(), jobDef.getId() + "-trigger")
                 .withSchedule(scheduleBuilder(jobDef.getScheduling())).build();
+        
         return trigger;
     }
 
@@ -81,7 +93,7 @@ public class JobServiceImpl implements JobService {
     }
 
     private void saveJobDef(JobDef jobDef) {
-        this.jobDefDao.saveJobDef(jobDef);
+        this.jobStateDao.saveJobDef(jobDef);
     }
     
 }

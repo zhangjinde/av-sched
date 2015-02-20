@@ -7,4 +7,5 @@ public interface JobService {
 
     public void scheduleJob(JobDef jobDef) throws AppException;
     
+    public void ackJob(String jobId) throws AppException;
 }
