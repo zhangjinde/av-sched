@@ -15,7 +15,13 @@ public class FailFastConfigurationChecker {
 
     private static final Logger LOG = LoggerFactory.getLogger(TrackingConfiguration.class);
 
-    private static final String[] MANDATORY_KEYS = new String[] { "av-sched.secret" };
+    private static final String[] MANDATORY_KEYS = new String[] { 
+        Keys.SECRET,
+        Keys.Db.SERVER,
+        Keys.Db.DB_NAME,
+        Keys.Db.PORT,
+        Keys.Db.USER,
+    };
 
     public synchronized void failIfNotCorrect(Configuration configuration) {
 

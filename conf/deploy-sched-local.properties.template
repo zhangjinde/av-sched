@@ -1,1 +1,8 @@
 av-sched.secret=changeme
+
+av-sched.db.server=mysql
+av-sched.db.port=3306
+av-sched.db.dbName=av_sched
+av-sched.db.user=changeme
+av-sched.db.password=changeme
+

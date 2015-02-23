@@ -56,4 +56,8 @@ public class AppException extends Exception {
         return map;
     }
 
+    public static AppException serverError(Throwable cause) {
+        return new AppException("unexpectedError", cause);
+    }
+
 }

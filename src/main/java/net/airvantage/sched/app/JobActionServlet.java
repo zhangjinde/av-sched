@@ -13,14 +13,20 @@ import net.airvantage.sched.app.mapper.JsonMapper;
 import net.airvantage.sched.model.JobId;
 import net.airvantage.sched.services.JobService;
 
-import org.apache.log4j.Logger;
 import org.quartz.SchedulerException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class JobActionServlet extends HttpServlet {
 
-    public static final Logger LOG = Logger.getLogger(JobActionServlet.class);
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
+    public static final Logger LOG = LoggerFactory.getLogger(JobActionServlet.class);
     
     private static final ObjectMapper JACKSON = new ObjectMapper();
     

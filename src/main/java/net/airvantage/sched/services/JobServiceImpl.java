@@ -10,7 +10,6 @@ import net.airvantage.sched.model.JobSchedulingDef;
 import net.airvantage.sched.model.JobSchedulingType;
 import net.airvantage.sched.quartz.PostHttpJob;
 
-import org.apache.log4j.Logger;
 import org.quartz.CronScheduleBuilder;
 import org.quartz.JobBuilder;
 import org.quartz.JobDetail;
@@ -20,10 +19,12 @@ import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class JobServiceImpl implements JobService {
 
-    private Logger LOG = Logger.getLogger(JobServiceImpl.class);
+    private Logger LOG = LoggerFactory.getLogger(JobServiceImpl.class);
 
     private Scheduler scheduler;
 
@@ -68,12 +69,13 @@ public class JobServiceImpl implements JobService {
     }
 
     protected JobDetail jobDefToJobDetail(JobDef jobDef) {
-        JobDetail detail = JobBuilder.newJob(PostHttpJob.class).withIdentity(jobDef.getId()).build();
+        JobDetail detail = JobBuilder.newJob(PostHttpJob.class).withIdentity(jobDef.getConfig().getId()).build();
         return detail;
     }
 
     protected static Trigger jobDefToTrigger(JobDef jobDef) throws AppException {
-        Trigger trigger = TriggerBuilder.newTrigger().withIdentity(jobDef.getId(), jobDef.getId() + "-trigger")
+        String id = jobDef.getConfig().getId();
+        Trigger trigger = TriggerBuilder.newTrigger().withIdentity(id, id + "-trigger")
                 .withSchedule(scheduleBuilder(jobDef.getScheduling())).build();
         
         return trigger;
@@ -92,8 +94,8 @@ public class JobServiceImpl implements JobService {
         return res;
     }
 
-    private void saveJobDef(JobDef jobDef) {
+    private void saveJobDef(JobDef jobDef) throws AppException {
         this.jobStateDao.saveJobDef(jobDef);
     }
-    
+
 }

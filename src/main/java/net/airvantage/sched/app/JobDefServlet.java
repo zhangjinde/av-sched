@@ -9,21 +9,22 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
-import org.quartz.SchedulerException;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-
 import net.airvantage.sched.app.mapper.JsonMapper;
 import net.airvantage.sched.model.JobDef;
 import net.airvantage.sched.services.JobService;
+
+import org.quartz.SchedulerException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 
 public class JobDefServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Logger LOG = Logger.getLogger(JobDefServlet.class);
+    private static final Logger LOG = LoggerFactory.getLogger(JobDefServlet.class);
     
     private static final ObjectMapper JACKSON = new ObjectMapper();
 
@@ -55,7 +56,7 @@ public class JobDefServlet extends HttpServlet {
             JobDef jobDef = JsonMapper.jobDef(req.getInputStream());
             jobService.scheduleJob(jobDef);
             // TODO(pht) or something better ?
-            res.put("id", jobDef.getId());
+            res.put("id", jobDef.getConfig().getId());
         } catch (AppException e) {
             LOG.debug("Exception while scheduling job", e);
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);

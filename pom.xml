@@ -4,9 +4,6 @@
 
 	<modelVersion>4.0.0</modelVersion>
 
-	<!-- <parent> <groupId>net.airvantage.sched</groupId> <artifactId>av-sched</artifactId> 
-		<version>0.0.1</version> </parent> -->
-
 	<groupId>net.airvantage.sched</groupId>
 	<artifactId>av-sched</artifactId>
 	<packaging>jar</packaging>
@@ -18,18 +15,6 @@
 			<groupId>org.quartz-scheduler</groupId>
 			<artifactId>quartz</artifactId>
 			<version>2.2.1</version>
-		</dependency>
-
-		<dependency>
-			<groupId>commons-configuration</groupId>
-			<artifactId>commons-configuration</artifactId>
-			<version>1.10</version>
-			<exclusions>
-				<exclusion>
-					<groupId>commons-logging</groupId>
-					<artifactId>commons-logging</artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 
 		<dependency>
@@ -84,10 +69,44 @@
 			<version>3.1.0</version>
 		</dependency>
 
+		<!-- Database -->
+
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>5.1.6</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.mybatis</groupId>
+			<artifactId>mybatis-migrations</artifactId>
+			<version>3.2.0</version>
+		</dependency>
+
+		<!-- Apache commons FTW -->
+
+		<dependency>
+			<groupId>commons-configuration</groupId>
+			<artifactId>commons-configuration</artifactId>
+			<version>1.10</version>
+			<exclusions>
+				<exclusion>
+					<groupId>commons-logging</groupId>
+					<artifactId>commons-logging</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>
 			<version>4.4</version>
+		</dependency>
+
+		<dependency>
+			<groupId>commons-dbutils</groupId>
+			<artifactId>commons-dbutils</artifactId>
+			<version>1.6</version>
 		</dependency>
 
 		<!-- Embedded jetty for quick webapp launch during development -->
@@ -143,6 +162,13 @@
 
 		<plugins>
 			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.7</source>
+					<target>1.7</target>
+				</configuration>
+			</plugin>
+			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
 				<!-- nothing here -->
@@ -156,7 +182,7 @@
 					</descriptors>
 					<archive>
 						<manifest>
-							<mainClass>net.airvantage.sched.app.Launcher</mainClass>
+							<mainClass>net.airvantage.sched.app.SchedJarLauncher</mainClass>
 						</manifest>
 					</archive>
 				</configuration>

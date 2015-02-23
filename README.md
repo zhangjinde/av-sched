@@ -2,9 +2,7 @@
 
 ## Work In Progress
 
-- This uses an in-memory quartz scheduler and job store
 - There is no UI
-- There is no jar launcher
 
 ## Configuration
 
@@ -15,6 +13,14 @@ A template exist in the "conf" folder.
 ### Mandatory
 
 - `av-sched.secret` : secret string exchanged in all API calls. (See [Security](#security) )
+
+- `av-sched.db.server`
+- `av-sched.db.port`
+- `av-sched.db.dbName`
+- `av-sched.db.user`
+- `av-sched.db.password`
+
+Database credentials. You should create the db and user yourself.
 
 ### Optional
 
@@ -27,6 +33,12 @@ A template exist in the "conf" folder.
 - `mvn eclipse:eclipse`
 - setup AVSCHED_CONF_DIR variable in build conf
 - Run `SchedMain`
+
+### From jar
+
+- `mvn package`
+- `export AVSCHED_CONF_DIR=/home/....`
+- `java -jar target/av-sched-x.y.z-exec.jar`
 
 ## API
 
@@ -62,3 +74,7 @@ POST host:8086/sched/api/job
   "id" : "av-server/timers"
 }
 ~~~
+
+## Functionnal Tests
+
+See src/node/README.md

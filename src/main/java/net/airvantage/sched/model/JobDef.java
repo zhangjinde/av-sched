@@ -2,24 +2,15 @@ package net.airvantage.sched.model;
 
 public class JobDef {
 
-    private String id;
-    private String url;
+    private JobConfig config;
     private JobSchedulingDef scheduling;
 
-    public String getId() {
-        return id;
+    public JobConfig getConfig() {
+        return config;
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
+    public void setConfig(JobConfig config) {
+        this.config = config;
     }
 
     public JobSchedulingDef getScheduling() {
@@ -30,14 +21,16 @@ public class JobDef {
         this.scheduling = scheduling;
     }
 
-    @Override
-    public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("{ id :" + id);
-        builder.append(", url :" + url);
-        builder.append(", sched :" + this.scheduling.toString());
-        builder.append(" }");
-        return builder.toString();
-    }
+//    
+//    @Override
+//    public String toString() {
+//        StringBuilder builder = new StringBuilder();
+//        builder.append("{ id :" + id);
+//        builder.append(", url :" + url);
+//        builder.append(", timeout :" + timeout);
+//        builder.append(", sched :" + this.scheduling.toString());
+//        builder.append(" }");
+//        return builder.toString();
+//    }
     
 }

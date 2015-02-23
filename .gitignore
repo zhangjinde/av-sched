@@ -2,3 +2,4 @@ bin
 .settings
 target
 conf/deploy-sched-local.properties
+node_modules

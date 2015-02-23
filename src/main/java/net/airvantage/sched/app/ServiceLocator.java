@@ -1,18 +1,25 @@
 package net.airvantage.sched.app;
 
+import javax.sql.DataSource;
+
 import net.airvantage.sched.conf.ConfigurationManager;
-import net.airvantage.sched.dao.DummyJobStateDao;
+import net.airvantage.sched.conf.Keys;
 import net.airvantage.sched.dao.JobStateDao;
+import net.airvantage.sched.dao.JobStateDaoImpl;
+import net.airvantage.sched.db.SchemaMigrator;
 import net.airvantage.sched.quartz.LockTriggerListener;
+import net.airvantage.sched.quartz.QuartzClusteredSchedulerFactory;
 import net.airvantage.sched.services.JobService;
 import net.airvantage.sched.services.JobServiceImpl;
 
+import org.apache.commons.configuration.Configuration;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.SchedulerFactory;
 import org.quartz.TriggerListener;
+import org.quartz.impl.StdSchedulerFactory;
 
 public class ServiceLocator {
 
@@ -33,6 +40,8 @@ public class ServiceLocator {
     private JobService jobService;
     private JobStateDao jobStateDao;
     private Scheduler scheduler;
+    private SchemaMigrator schemaMigrator;
+    private DataSource dataSource;
 
     public void init() {
         instance = this;
@@ -52,16 +61,44 @@ public class ServiceLocator {
 
     public JobStateDao getJobStateDao() {
         if (jobStateDao == null) {
-            // jobStateDao = new JobStateDaoImpl();
-            jobStateDao = new DummyJobStateDao();
+            jobStateDao = new JobStateDaoImpl(getDataSource());
+
+            // jobStateDao = new DummyJobStateDao();
         }
         return jobStateDao;
     }
 
+    private DataSource getDataSource() {
+        if (dataSource == null) {
+            Configuration config = getConfigManager().get();
+            com.mysql.jdbc.jdbc2.optional.MysqlConnectionPoolDataSource ds = new com.mysql.jdbc.jdbc2.optional.MysqlConnectionPoolDataSource();
+            ds.setServerName(config.getString(Keys.Db.SERVER));
+            ds.setPortNumber(config.getInt(Keys.Db.PORT));
+            ds.setDatabaseName(config.getString(Keys.Db.DB_NAME));
+            ds.setUser(config.getString(Keys.Db.USER));
+            ds.setPassword(config.getString(Keys.Db.PASSWORD));
+            dataSource = ds;
+        }
+        return dataSource;
+    }
+
+    public SchemaMigrator getSchemaMigrator() {
+        if (schemaMigrator == null) {
+            schemaMigrator = new SchemaMigrator(getDataSource());
+        }
+        return schemaMigrator;
+    }
+
     public Scheduler getScheduler() throws SchedulerException {
         if (scheduler == null) {
-            SchedulerFactory schedFact = new org.quartz.impl.StdSchedulerFactory();
+            
+            /*
+            StdSchedulerFactory schedFact = new org.quartz.impl.StdSchedulerFactory();
             scheduler = schedFact.getScheduler();
+            */
+            
+            scheduler = QuartzClusteredSchedulerFactory.buildScheduler(getConfigManager().get());
+           
             scheduler.start();
             scheduler.getListenerManager().addTriggerListener(getLockTriggerListener());
         }

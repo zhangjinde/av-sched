@@ -1,0 +1,8 @@
+
+[0m[0m
+[0m  av-sched[0m
+[2K[0G  [32m  ✓[0m[90m can schedule cron jobs until ack arrives [0m[31m(8478ms)[0m
+
+
+[92m [0m[32m 1 passing[0m[90m (8s)[0m
+

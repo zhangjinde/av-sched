@@ -2,13 +2,19 @@ package net.airvantage.sched.model;
 
 import java.util.Date;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class JobLock {
+    
+    private static final Logger LOG = LoggerFactory.getLogger(JobLock.class);
+    
     private boolean locked;
-    private Long expiration;
+    private Long expiresAt;
     
     public JobLock() {
         locked = false;
-        expiration = null;
+        expiresAt = null;
     }
     
     public boolean isLocked() {
@@ -17,11 +23,13 @@ public class JobLock {
     public void setLocked(boolean locked) {
         this.locked = locked;
     }
-    public Long getExpiration() {
-        return expiration;
+    
+    public Long getExpiresAt() {
+        return expiresAt;
     }
-    public void setExpiration(Long expiration) {
-        this.expiration = expiration;
+
+    public void setExpiresAt(Long expiresAt) {
+        this.expiresAt = expiresAt;
     }
 
     public boolean isExpired() {
@@ -29,7 +37,10 @@ public class JobLock {
     }
     
     public boolean isExpired(Date date) {
-        return (this.expiration != null && this.expiration < date.getTime());
+        LOG.debug("Checking if expired : " + this.expiresAt + " vs " + date.getTime());
+        boolean expired = (this.expiresAt != null && this.expiresAt < date.getTime());
+        LOG.debug("Is it expired ? " + expired);
+        return expired;
     }
     
 }

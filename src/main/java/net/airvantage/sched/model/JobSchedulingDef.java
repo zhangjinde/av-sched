@@ -5,7 +5,6 @@ public class JobSchedulingDef {
     
     private JobSchedulingType type;
     private String value;
-    private long timeout; 
     
     public JobSchedulingType getType() {
         return type;
@@ -23,13 +22,6 @@ public class JobSchedulingDef {
         this.value = value;
     }
 
-    public long getTimeout() {
-        return timeout;
-    }
-
-    public void setTimeout(long timeout) {
-        this.timeout = timeout;
-    }
     
     @Override
     public String toString() {
