@@ -1,0 +1,15 @@
+[Unit]
+Description=av-sched
+After=av-log.service
+Requires=av-log.service
+
+[Service]
+TimeoutStartSec=0
+Restart=on-failure
+RestartSec=5
+ExecStartPre=-/usr/bin/docker kill av-sched
+ExecStartPre=-/usr/bin/docker rm av-sched
+ExecStart=/usr/bin/docker run --name=av-sched -p 8080:8080 --link av-log:av-log -v /etc/av-sched:/etc/av-sched -v /var/av-sched:/var/av-sched airvantage/av-sched:current
+
+[Install]
+WantedBy=multi-user.target

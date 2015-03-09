@@ -1,0 +1,32 @@
+{
+    "variables": {
+        "app_version": ""
+    },
+
+    "builders": [ {
+        "type": "amazon-ebs",
+        "region": "eu-west-1",
+        "source_ami": "ami-11199466",
+        "instance_type": "t2.medium",
+        "ssh_username": "admin",
+        "ami_name": "av-sched-{{user `app_version`}}"
+    }],
+
+    "provisioners": [
+        {
+            "type": "file",
+            "source": "av-sched.service",
+            "destination": "/tmp/av-sched.service"
+        },
+        {
+            "type": "file",
+            "source": "logback.xml",
+            "destination": "/tmp/logback.xml"
+        },
+        {
+            "type": "shell",
+            "script": "provision.sh",
+            "environment_vars": [ "APP_VERSION={{user `app_version`}}" ]
+        }
+    ]
+}
