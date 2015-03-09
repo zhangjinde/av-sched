@@ -110,6 +110,11 @@
             "Default": 900
         },
 
+        "AvSchedSecret": {
+            "Description": "Shared String between av-sched and its clients",
+            "Type": "String"
+        },
+
         "DBInstanceClass": {
             "Description": "The database instance type",
             "Type": "String",
@@ -477,8 +482,12 @@
                                 " content: |\n",
                                 " av-sched.local.tmp.dir=/tmp/log\n",
                                 " av-sched.version=", { "Ref": "AppVersion" }, "\n",
-                                // TODO(pht) add everything
-                                " av-sched.db.---", {}, "\n",
+                                " av-sched.secret=", { "Ref": "AvSchedSecret" }, "\n",
+                                " av-sched.db.server=", { "Ref": "AvSchedDbDNS"}, "\n",
+                                " av-sched.db.port=3306\n",
+                                " av-sched.db.dbName=sched\n",
+                                " av-sched.db.user=", {"Ref" : "DbUser"}, "\n",
+                                " av-sched.db.password=", {"Ref" : "DbPwd"}, "\n",
                                 " - path: /etc/av-sched/logback.xml\n",
                                 " permissions: 0644\n",
                                 " owner: core\n",
