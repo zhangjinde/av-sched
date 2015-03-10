@@ -39,7 +39,7 @@ function build_stack_params {
 
     extract=`noho stack extract_params \
             -stackName=$NETWORK_STACK \
-            -resourceNames=PublicSubnetA,PublicSubnetB,PublicSubnetC,PublicSecurityGroup,PrivateSubnetA,PrivateSubnetB,PrivateSubnetC,PrivateSecurityGroup`
+            -resourceNames=PrivateSubnetA,PrivateSubnetB,PrivateSubnetC,PrivateSecurityGroup`
     stack_params=`echo $extract | noho stack append_params \
                  -parameters=EnvName=$ENV_NAME,KeyPair=dev,AppVersion=$VERSION,AvSchedSecret=$AV_SCHED_SECRET`
     echo "New paremeters are:"

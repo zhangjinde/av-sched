@@ -64,26 +64,6 @@
             "Type": "String"
         },
 
-        "PublicSubnetA": {
-            "Description": "Subnet to put application (AZ A)",
-            "Type": "String"
-        },
-
-        "PublicSubnetB": {
-            "Description": "Subnet to put application (AZ B)",
-            "Type": "String"
-        },
-
-        "PublicSubnetC": {
-            "Description": "Subnet to put application (AZ C)",
-            "Type": "String"
-        },
-
-        "PublicSecurityGroup": {
-            "Description": "Security group to apply to the application",
-            "Type": "String"
-        },
-
         "PrivateSubnetA": {
             "Description": "Subnet to put application (AZ A)",
             "Type": "String"
