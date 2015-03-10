@@ -29,8 +29,8 @@
             "us-west-1": {
                 "AMI": "ami-17fae852"
             },
-            "eu-west-1": {
-                "AMI": "ami-11df4e66"
+            "eu-west-1" : {
+                "AMI" : "ami-cbe87bbc"
             }
         }
     },
