@@ -152,7 +152,11 @@
             "Type": "String",
             "Default": "changeit",
             "NoEcho": "true"
-        },
+        }
+    },
+
+    "Conditions" : {
+        "UseDBIops":      { "Fn::Not":    [ {"Fn::Equals" : [ {"Ref" : "DBIops"} , "" ] } ] }
     },
 
     "Outputs": {
@@ -178,8 +182,7 @@
                 }]]
             }
         }
-    }
-
+    },
     "Resources": {
 
         "AvSchedDNS": {
@@ -198,7 +201,7 @@
                 "Type": "CNAME",
                 "TTL": "900",
                 "ResourceRecords": [{
-                    "Fn::GetAtt": ["AvUIELB", "DNSName"]
+                    "Fn::GetAtt": ["AvSchedELB", "DNSName"]
                 }]
             }
         },
@@ -413,11 +416,11 @@
         "AvSchedLaunchConfig": {
             "Type": "AWS::AutoScaling::LaunchConfiguration",
             "Properties": {
-                "ImageId": { "Ref" : "AVBaseAMI" },
+		"ImageId": { "Fn::FindInMap" : [ "CoreOsAmiMap", { "Ref" : "AWS::Region" }, "AMI" ]},
                 "InstanceType": { "Ref": "InstanceType" },
                 "KeyName": { "Ref": "KeyPair" },
                 "SecurityGroups": [ { "Ref": "PrivateSecurityGroup" } ],
-                "IamInstanceProfile": { "Ref": "AvDataInstanceProfile" },
+                "IamInstanceProfile": { "Ref": "AvSchedInstanceProfile" },
                 "BlockDeviceMappings" : [ {
                     "DeviceName" : "/dev/xvda",
                     "Ebs" : { "VolumeSize" : "50", "VolumeType": "gp2" }
@@ -473,7 +476,6 @@
                                 " permissions: '0744'\n",
                                 " owner: core\n",
                                 " content: |\n",
-                                " AV_ENVIRONMENT_TYPE=", { "Ref": "EnvType" }, "\n",
                                 " AV_ENVIRONMENT_NAME=", { "Ref": "EnvName" }, "\n",
                                 " AV_APPLICATION=av-sched\n",
                                 " - path: /etc/av-sched/deploy-sched-local.properties\n",
@@ -486,8 +488,8 @@
                                 " av-sched.db.server=", { "Ref": "AvSchedDbDNS"}, "\n",
                                 " av-sched.db.port=3306\n",
                                 " av-sched.db.dbName=sched\n",
-                                " av-sched.db.user=", {"Ref" : "DbUser"}, "\n",
-                                " av-sched.db.password=", {"Ref" : "DbPwd"}, "\n",
+                                " av-sched.db.user=", {"Ref" : "DBUser"}, "\n",
+                                " av-sched.db.password=", {"Ref" : "DBPwd"}, "\n",
                                 " - path: /etc/av-sched/logback.xml\n",
                                 " permissions: 0644\n",
                                 " owner: core\n",

@@ -6,6 +6,7 @@ VERSION=dev-`date +%Y-%m-%d-%s`
 ENV_NAME=dev
 NETWORK_STACK=$ENV_NAME-net
 STACK_NAME=$ENV_NAME-av-sched
+AV_SCHED_SECRET=changeme
 
 ####### Functions
 
@@ -16,6 +17,7 @@ function build_java {
     echo ">>"
     echo
 
+    echo "FIXME"
     mvn clean package -q
 }
 
@@ -26,54 +28,21 @@ function upload_resources {
     echo ">>"
     echo
 
-    aws s3 cp av-sched/target/av-sched-*-exec.jar s3://av-repo/apps/av-sched/${VERSION}/artifacts/av-sched.jar
+    aws s3 cp target/av-sched-*-exec.jar s3://av-repo/apps/av-sched/${VERSION}/artifacts/av-sched.jar
     aws s3 cp release/cloudformation/av-sched.template s3://av-repo/deployments/av-sched/${VERSION}/cloudformation/
 }
 
-# function extract_network_params {
-#     network_params=`aws cloudformation describe-stacks --stack-name $NETWORK_STACK`
-#     if [ "$network_params" ]
-#     then
-#         network_params=`echo $network_params | jq -c '.Stacks[0].Parameters \
-#             | map(select( \
-#                 .ParameterKey == "NetworkPrefix" or \
-#                 .ParameterKey == "EnvName" ))'`
-#     else
-#         echo "Network stack not found: EXIT"
-#         exit 1
-#     fi
-# }
-
-# function extract_network_resources {
-#     network_resources=`aws cloudformation describe-stack-resources --stack-name $NETWORK_STACK`
-#     if [ "$network_resources" ]
-#     then
-#         network_resources=`echo $network_resources | jq -c '.StackResources \
-#             | map({ParameterKey: .LogicalResourceId, ParameterValue: .PhysicalResourceId}) \
-#             | map(select( \
-#                 .ParameterKey == "Vpc" or \
-#                 .ParameterKey == "PrivateSubnetA" or \
-#                 .ParameterKey == "PrivateSubnetB" or \
-#                 .ParameterKey == "PrivateSubnetC" or \
-#                 .ParameterKey == "PublicRouteTable" or \
-#                 .ParameterKey == "PrivateSecurityGroup" ))'`
-#     else
-#         echo "Network stack not found: EXIT"
-#         exit 1
-#     fi
-# }
-
 function build_stack_params {
-    aa=`echo  $NETWORK_STACK`
-    extract=`noho stack_extract \
-        -stackName=$NETWORK_STACK \
-        -parameterNames=EnvName,EnvType,NetworkPrefix \
-        -resourceNames=Vpc,PrivateSubnetA,PrivateSubnetB,PrivateSubnetC,PrivateSecurityGroup,PublicWithVpnRouteTable,AlarmSNSTopic,S3LoggingBucket`
-    stack_params=`echo $extract | noho append_parameters \
-        -parameters=AppVersion=$VERSION`
-    stack_params=`echo [$stack_params,$(cat release/conf.json)] | jq -c '.[0] + .[1]'`
 
-    echo "New stack paremeters:"
+    echo "Build Stack Params"
+    echo "Extract params from $NETWORK_STACK"
+
+    extract=`noho stack extract_params \
+            -stackName=$NETWORK_STACK \
+            -resourceNames=PublicSubnetA,PublicSubnetB,PublicSubnetC,PublicSecurityGroup,PrivateSubnetA,PrivateSubnetB,PrivateSubnetC,PrivateSecurityGroup`
+    stack_params=`echo $extract | noho stack append_params \
+                 -parameters=EnvName=$ENV_NAME,KeyPair=dev,AppVersion=$VERSION,AvSchedSecret=$AV_SCHED_SECRET`
+    echo "New paremeters are:"
     echo $stack_params | jq '.'
 }
 
@@ -131,4 +100,3 @@ fi
 if [ $? -eq 0 ]
     then create_or_update_stack
 fi
-
