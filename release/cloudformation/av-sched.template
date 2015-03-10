@@ -226,15 +226,15 @@
                     }, "-av-sched-public-elb"]]
                 },
                 "SecurityGroups": [{
-                    "Ref": "PublicSecurityGroup"
+                    "Ref": "PrivateSecurityGroup"
                 }],
                 "CrossZone": true,
                 "Subnets": [{
-                    "Ref": "PublicSubnetA"
+                    "Ref": "PrivateSubnetA"
                 }, {
-                    "Ref": "PublicSubnetB"
+                    "Ref": "PrivateSubnetB"
                 }, {
-                    "Ref": "PublicSubnetC"
+                    "Ref": "PrivateSubnetC"
                 }],
                 "HealthCheck": {
                     "Target": "HTTP:8086/",
