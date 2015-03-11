@@ -20,14 +20,14 @@ public class SchemaMigrator {
     }
 
     public void bootstrap() {
-        // new LockOperation().operate(dataSourceConnectionProvider, fileMigrationLoader, null, null);
-        // new BootstrapOperation(true).operate(dataSourceConnectionProvider, fileMigrationLoader, null, null);
+        new LockOperation().operate(dataSourceConnectionProvider, fileMigrationLoader, null, null);
+        new BootstrapOperation(true).operate(dataSourceConnectionProvider, fileMigrationLoader, null, null);
         new UnlockOperation().operate(dataSourceConnectionProvider, fileMigrationLoader, null, null);
     }
 
     public void migrate() {
-        // new LockOperation().operate(dataSourceConnectionProvider, fileMigrationLoader, null, null);
-        // new UpOperation().operate(dataSourceConnectionProvider, fileMigrationLoader, null, null);
+        new LockOperation().operate(dataSourceConnectionProvider, fileMigrationLoader, null, null);
+        new UpOperation().operate(dataSourceConnectionProvider, fileMigrationLoader, null, null);
         new UnlockOperation().operate(dataSourceConnectionProvider, fileMigrationLoader, null, null);
     }
 

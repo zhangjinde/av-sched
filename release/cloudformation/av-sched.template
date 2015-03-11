@@ -415,10 +415,13 @@
                                 " update:\n",
                                 " reboot-strategy: off\n\n",
                                 " units:\n",
+
                                 " - name: av-log.service\n",
                                 "   command: start\n",
+
                                 " - name: av-keys.timer\n",
                                 "   command: start\n",
+
                                 " - name: download-av-sched-jar.service\n",
                                 "   command: start\n",
                                 "   content: |\n",
@@ -434,6 +437,7 @@
                                 "    ExecStart=/opt/bin/aws s3 cp s3://av-repo/apps/av-sched/", { "Ref": "AppVersion" }, "/artifacts/av-sched.jar ./av-sched/\n",
                                 "    [Install]\n",
                                 "    WantedBy=multi-user.target\n",
+
                                 " - name: av-sched.service\n",
                                 "   command: start\n",
                                 "   content: |\n",
@@ -453,12 +457,14 @@
                                 "    WantedBy=multi-user.target\n",
 
                                 "write_files:\n",
+
                                 " - path: /etc/av/environment\n",
                                 "   permissions: '0744'\n",
                                 "   owner: core\n",
                                 "   content: |\n",
                                 "    AV_ENVIRONMENT_NAME=", { "Ref": "EnvName" }, "\n",
                                 "    AV_APPLICATION=av-sched\n",
+
                                 " - path: /etc/av-sched/deploy-sched-local.properties\n",
                                 "   permissions: '0744'\n",
                                 "   owner: core\n",
@@ -471,6 +477,7 @@
                                 "    av-sched.db.dbName=sched\n",
                                 "    av-sched.db.user=", {"Ref" : "DBUser"}, "\n",
                                 "    av-sched.db.password=", {"Ref" : "DBPwd"}, "\n",
+
                                 " - path: /etc/av-sched/logback.xml\n",
                                 "   permissions: 0644\n",
                                 "   owner: core\n",
