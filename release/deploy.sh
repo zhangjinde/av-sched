@@ -73,7 +73,7 @@ function create_or_update_stack {
         echo ">"
         echo
 
-        echo aws cloudformation update-stack \
+        aws cloudformation update-stack \
             --template-url https://s3-eu-west-1.amazonaws.com/av-repo/deployments/av-sched/${VERSION}/cloudformation/av-sched.template \
             --stack-name $STACK_NAME \
             --parameters $stack_params \
