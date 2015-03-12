@@ -378,11 +378,14 @@
                             "Effect": "Allow",
                             "Action": ["s3:*", "s3:ListObjects"],
                             "Resource": "arn:aws:s3:::av-access-keys/*"
-                        }, {
+                        },
+                        {
                             "Effect": "Allow",
-                            "Action": ["s3:*"],
-                            "Resource": "arn:aws:s3:::av-secrets/*"
-                        }, {
+                            "Action": [ "s3:Get*", "s3:List*" ],
+                            "Resource": [{ "Fn::Join" : [ "", [ "arn:aws:s3:::av-" , { "Ref": "EnvType" }, "-secrets", "/*" ] ] },
+                                         { "Fn::Join" : [ "", [ "arn:aws:s3:::av-" , { "Ref": "EnvType" }, "-secrets" ] ] }]
+                        },
+                        {
                             "Effect": "Allow",
                             "Action": ["s3:*"],
                             "Resource": "arn:aws:s3:::av-repo/*"
