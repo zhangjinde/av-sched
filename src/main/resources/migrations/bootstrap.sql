@@ -9,11 +9,8 @@
 -- Create schema for CHANGELOG model
 -----------------------------------------------------------------------------------------------------------------------  
 
-CREATE TABLE CHANGELOG (
+CREATE TABLE IF NOT EXISTS CHANGELOG (
     ID NUMERIC(20,0) PRIMARY KEY,
     APPLIED_AT VARCHAR(25) NOT NULL,
     DESCRIPTION VARCHAR(255) NOT NULL
 );
-
---//@UNDO
-DROP TABLE CHANGELOG;

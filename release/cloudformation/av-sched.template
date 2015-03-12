@@ -462,6 +462,7 @@
                                 "   permissions: '0744'\n",
                                 "   owner: core\n",
                                 "   content: |\n",
+                                "    AV_ENVIRONMENT_TYPE=", { "Ref": "EnvType" }, "\n",
                                 "    AV_ENVIRONMENT_NAME=", { "Ref": "EnvName" }, "\n",
                                 "    AV_APPLICATION=av-sched\n",
 

@@ -3,7 +3,10 @@
 ####### Constants
 
 VERSION=dev-`date +%Y-%m-%d-%s`
+
+ENV_TYPE=preprod
 ENV_NAME=dev
+
 NETWORK_STACK=$ENV_NAME-net
 STACK_NAME=$ENV_NAME-av-sched
 AV_SCHED_SECRET=changeme
@@ -43,7 +46,7 @@ function build_stack_params {
             -stackName=$NETWORK_STACK \
             -resourceNames=PrivateSubnetA,PrivateSubnetB,PrivateSubnetC,PrivateSecurityGroup`
     stack_params=`echo $extract | noho stack append_params \
-                 -parameters=EnvName=$ENV_NAME,KeyPair=dev,AppVersion=$VERSION,AvSchedSecret=$AV_SCHED_SECRET,HealthCheckGracePeriod=$HC_GRACE_PERIOD`
+                 -parameters=EnvType=$ENV_TYPE,EnvName=$ENV_NAME,KeyPair=dev,AppVersion=$VERSION,AvSchedSecret=$AV_SCHED_SECRET,HealthCheckGracePeriod=$HC_GRACE_PERIOD`
     echo "New paremeters are:"
     echo $stack_params | jq '.'
 }
