@@ -37,6 +37,15 @@
 
     "Parameters": {
 
+        "EnvType": {
+            "Description": "The type of the environment",
+            "Type": "String",
+            "Default": "preprod",
+            "AllowedPattern": "[A-Za-z0-9]+",
+            "MinLength": 2,
+            "MaxLength": 15
+        },
+
         "EnvName": {
             "Description": "The name of the environment: used for naming resources.",
             "Type": "String",
