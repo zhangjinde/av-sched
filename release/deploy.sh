@@ -77,7 +77,8 @@ function create_or_update_stack {
             --template-url https://s3-eu-west-1.amazonaws.com/av-repo/deployments/av-sched/${VERSION}/cloudformation/av-sched.template \
             --stack-name $STACK_NAME \
             --parameters $stack_params \
-            --stack-policy-during-update-url s3://av-repo/stack-update-policies/allow_all.json \
+            --stack-policy-url https://s3-eu-west-1.amazonaws.com/av-repo/stack-update-policies/deny_all.json \
+            --stack-policy-during-update-url https://s3-eu-west-1.amazonaws.com/av-repo/stack-update-policies/allow_all.json \
             --capabilities CAPABILITY_IAM  | jq '.'
     fi
 }
