@@ -1,10 +1,11 @@
 package net.airvantage.sched.dao;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import com.google.common.collect.Lists;
 
 import net.airvantage.sched.app.AppException;
 import net.airvantage.sched.model.JobDef;
@@ -70,5 +71,5 @@ public class DummyJobStateDao implements JobStateDao {
         res.addAll(states.values());
         return res;
     }
-    
+
 }
