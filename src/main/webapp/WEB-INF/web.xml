@@ -4,6 +4,19 @@
 	xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee
          http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
 
+	<!-- Default servlet -->
+	<servlet>
+		<servlet-name>default</servlet-name>
+		<servlet-class>org.eclipse.jetty.servlet.DefaultServlet</servlet-class>
+		<init-param>
+			<param-name>dirAllowed</param-name>
+			<param-value>false</param-value>
+		</init-param>
+	</servlet>
+
+	<welcome-file-list>
+		<welcome-file>public/index.html</welcome-file>
+	</welcome-file-list>
 	<!-- Definition of a new job -->
 	<servlet>
 		<servlet-name>jobDefServlet</servlet-name>
@@ -16,10 +29,16 @@
 		<servlet-class>net.airvantage.sched.app.JobActionServlet</servlet-class>
 	</servlet>
 
-	<!-- Check heath -->
+<!-- Check heath -->
 	<servlet>
 		<servlet-name>healthCheckServlet</servlet-name>
 		<servlet-class>net.airvantage.sched.app.HealthCheckServlet</servlet-class>
+	</servlet>
+
+<!-- Query job states -->
+	<servlet>
+		<servlet-name>jobStateServlet</servlet-name>
+		<servlet-class>net.airvantage.sched.app.JobStateServlet</servlet-class>
 	</servlet>
 
 	<!-- Check known secret -->
@@ -31,23 +50,33 @@
 	<!-- Filter Mappings -->
 	<filter-mapping>
 		<filter-name>schedSecretFilter</filter-name>
-		<url-pattern>/api/*</url-pattern>
+		<url-pattern>/api/job-def/*</url-pattern>
 	</filter-mapping>
 
-	<!-- Servlet Mappings -->
+    <filter-mapping>
+        <filter-name>schedSecretFilter</filter-name>
+        <url-pattern>/api/job-action/*</url-pattern>
+    </filter-mapping>
+
+    <!-- Servlet mappings -->    
 	<servlet-mapping>
 		<servlet-name>jobDefServlet</servlet-name>
-		<url-pattern>/api/job</url-pattern>
+		<url-pattern>/api/job-def</url-pattern>
 	</servlet-mapping>
 
 	<servlet-mapping>
 		<servlet-name>jobActionServlet</servlet-name>
-		<url-pattern>/api/job/ack</url-pattern>
+		<url-pattern>/api/job-action/ack</url-pattern>
 	</servlet-mapping>
 
-    <servlet-mapping>
-        <servlet-name>healthCheckServlet</servlet-name>
-        <url-pattern>/check</url-pattern>
-    </servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>jobStateServlet</servlet-name>
+		<url-pattern>/api/job</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>default</servlet-name>
+		<url-pattern>/*</url-pattern>
+	</servlet-mapping>
 
 </web-app>

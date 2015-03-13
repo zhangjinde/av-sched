@@ -28,13 +28,22 @@ Database credentials. You should create the db and user yourself.
 
 ## Usage
 
-### From eclipse
+### Build UI
+
+- `npm install -g gulp`
+- `npm install -g bower`
+- `bower install`
+- `gulp build` (or `gulp dev` if you want js files to be recompiled on the fly)
+
+### Run server
+
+#### From eclipse
 
 - `mvn eclipse:eclipse`
 - setup AVSCHED_CONF_DIR variable in build conf
 - Run `SchedMain`
 
-### From jar
+#### From jar
 
 - `mvn package`
 - `export AVSCHED_CONF_DIR=/home/....`

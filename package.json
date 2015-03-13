@@ -1,0 +1,15 @@
+{
+  "name": "av-sched",
+  "devDependencies": {
+    "babel": "^4.7.9",
+    "babelify": "^5.0.4",
+    "browserify": "^9.0.3",
+    "gulp": "^3.8.11",
+    "gulp-sourcemaps": "^1.5.0",
+    "gulp-uglify": "^1.1.0",
+    "gulp-util": "^3.0.4",
+    "vinyl-buffer": "^1.0.0",
+    "vinyl-source-stream": "^1.1.0",
+    "watchify": "^2.4.0"
+  }
+}

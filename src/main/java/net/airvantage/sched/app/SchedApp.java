@@ -28,9 +28,20 @@ public class SchedApp {
 
         Server server = new Server(port);
 
-        WebAppContext context = contextBuilder.buildContext();
+        WebAppContext webAppContext = contextBuilder.buildContext();
 
-        server.setHandler(context);
+        /* K
+        ResourceHandler resourceHandler = new ResourceHandler();
+        resourceHandler.setDirectoriesListed(false);
+        resourceHandler.setWelcomeFiles(new String[]{ "public/index.html" });
+
+        HandlerList handlerList = new HandlerList();
+        handlerList.setHandlers(new Handler[] { resourceHandler, webAppContext});
+        
+        server.setHandler(handlerList);
+        */
+        
+        server.setHandler(webAppContext);
         server.start();
 
         JobDefServlet.startupDuration = System.currentTimeMillis() - start;

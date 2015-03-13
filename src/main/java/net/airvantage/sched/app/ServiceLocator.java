@@ -17,7 +17,9 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
+import org.quartz.SchedulerFactory;
 import org.quartz.TriggerListener;
+import org.quartz.impl.StdSchedulerFactory;
 
 public class ServiceLocator {
 
@@ -59,7 +61,9 @@ public class ServiceLocator {
 
     public JobStateDao getJobStateDao() {
         if (jobStateDao == null) {
-            jobStateDao = new JobStateDaoImpl(getDataSource());
+            DataSource dataSource = getDataSource();
+            jobStateDao = new JobStateDaoImpl(new JobConfigDaoImpl(dataSource), new JobLockDaoImpl(dataSource));
+            // jobStateDao = new DummyJobStateDao();
         }
         return jobStateDao;
     }
@@ -80,13 +84,14 @@ public class ServiceLocator {
 
     public SchemaMigrator getSchemaMigrator() throws Exception {
         if (schemaMigrator == null) {
-            return new SchemaMigrator(getDataSource());
+            schemaMigrator = new SchemaMigrator(getDataSource());
         }
         return schemaMigrator;
     }
 
     public Scheduler getScheduler() throws SchedulerException {
         if (scheduler == null) {
+            
             scheduler = QuartzClusteredSchedulerFactory.buildScheduler(getConfigManager().get());
            
             scheduler.start();

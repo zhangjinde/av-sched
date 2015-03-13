@@ -1,0 +1,11 @@
+{
+    "undef": true,
+    "unused": "vars",
+    "browser" : true,
+    "laxbreak" : true, 
+    "sub" : true,
+    "esnext" : true,
+    "globals" : {
+       "React" : true
+    }
+}

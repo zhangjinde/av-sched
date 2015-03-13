@@ -1,9 +1,15 @@
 package net.airvantage.sched.dao;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import com.google.common.collect.Lists;
+
+import net.airvantage.sched.app.AppException;
 import net.airvantage.sched.model.JobDef;
 import net.airvantage.sched.model.JobLock;
 import net.airvantage.sched.model.JobState;
@@ -49,4 +55,11 @@ public class DummyJobStateDao implements JobStateDao {
         states.put(id, st);
     }
 
+    @Override
+    public List<JobState> getJobStates() throws AppException {
+        List<JobState> res = new ArrayList<JobState>();
+        res.addAll(states.values());
+        return res;
+    }
+    
 }
