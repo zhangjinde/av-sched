@@ -1,3 +1,7 @@
-import HelloMessage from "./hello";
+import JobsPage from "./views/jobsPage";
+import JobStore from "./stores/jobStore";
 
-React.render(<HelloMessage name ="PHT"/>, document.getElementById("root"));
+JobStore.fetch().then(function () {
+    React.render(<JobsPage/>, document.getElementById("root"));
+});
+
