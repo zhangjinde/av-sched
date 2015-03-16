@@ -408,7 +408,7 @@
         "AvSchedLaunchConfig": {
             "Type": "AWS::AutoScaling::LaunchConfiguration",
             "Properties": {
-		"ImageId": { "Fn::FindInMap" : [ "CoreOsAmiMap", { "Ref" : "AWS::Region" }, "AMI" ]},
+        "ImageId": { "Fn::FindInMap" : [ "CoreOsAmiMap", { "Ref" : "AWS::Region" }, "AMI" ]},
                 "InstanceType": { "Ref": "InstanceType" },
                 "KeyName": { "Ref": "KeyPair" },
                 "SecurityGroups": [ { "Ref": "PrivateSecurityGroup" } ],
