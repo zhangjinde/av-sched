@@ -22,7 +22,6 @@ public class SchedApp {
 
         SchemaMigrator schemaMigrator = ServiceLocator.getInstance().getSchemaMigrator();
 
-        schemaMigrator.bootstrap();
         schemaMigrator.migrate();
 
         int port = ServiceLocator.getInstance().getPort();

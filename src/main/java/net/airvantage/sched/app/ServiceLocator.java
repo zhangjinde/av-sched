@@ -15,13 +15,9 @@ import net.airvantage.sched.services.JobServiceImpl;
 import org.apache.commons.configuration.Configuration;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.ibatis.migration.ConnectionProvider;
-import org.apache.ibatis.migration.JdbcConnectionProvider;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
-import org.quartz.SchedulerFactory;
 import org.quartz.TriggerListener;
-import org.quartz.impl.StdSchedulerFactory;
 
 public class ServiceLocator {
 
@@ -64,8 +60,6 @@ public class ServiceLocator {
     public JobStateDao getJobStateDao() {
         if (jobStateDao == null) {
             jobStateDao = new JobStateDaoImpl(getDataSource());
-
-            // jobStateDao = new DummyJobStateDao();
         }
         return jobStateDao;
     }
@@ -86,26 +80,13 @@ public class ServiceLocator {
 
     public SchemaMigrator getSchemaMigrator() throws Exception {
         if (schemaMigrator == null) {
-            Configuration config = getConfigManager().get();
-            String jdbcUrl = "jdbc:mysql://" + config.getString(Keys.Db.SERVER) + ":" +
-                    config.getInt(Keys.Db.PORT) + "/" + config.getString(Keys.Db.DB_NAME) + "?user=" + config.getString(Keys.Db.USER) + "&password=" + config.getString(Keys.Db.PASSWORD);
-            
-            JdbcConnectionProvider provider = new JdbcConnectionProvider("com.mysql.jdbc.Driver", 
-                    jdbcUrl, config.getString(Keys.Db.USER), config.getString(Keys.Db.PASSWORD));
-            
-            schemaMigrator = new SchemaMigrator(provider);
+            return new SchemaMigrator(getDataSource());
         }
         return schemaMigrator;
     }
 
     public Scheduler getScheduler() throws SchedulerException {
         if (scheduler == null) {
-            
-            /*
-            StdSchedulerFactory schedFact = new org.quartz.impl.StdSchedulerFactory();
-            scheduler = schedFact.getScheduler();
-            */
-            
             scheduler = QuartzClusteredSchedulerFactory.buildScheduler(getConfigManager().get());
            
             scheduler.start();
