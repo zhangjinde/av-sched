@@ -12,10 +12,9 @@ REPO_NAME=av-sched
 # Name of the cloudformation template
 TEMPLATE_NAME=av-sched.template
 
-# Default values for EnvName, KeyPair, BaseAMI
+# Default values for EnvName, BaseAMI
 declare -A DEFAULT_PARAMS
 DEFAULT_PARAMS[EnvName]=dev
-DEFAULT_PARAMS[KeyPair]=dev
 DEFAULT_PARAMS[BaseAMI]=ami-cbe87bbc
 
 # Configuration files located on AWS S3 buckets
@@ -25,13 +24,13 @@ declare -A AWS_S3_BUCKETS
 AWS_S3_BUCKETS[preprod]="s3://av-preprod-secrets/files/config/av-sched.cfg"
 
 # List of the network parameters to extract
-NETWORK_PARAMS_NAMES=( PrivateSubnetA PrivateSubnetB PrivateSubnetC PrivateSecurityGroup EnvType )
+NETWORK_PARAMS_NAMES=( PrivateSubnetA PrivateSubnetB PrivateSubnetC PrivateSecurityGroup KeyPair EnvType )
 
 # List of stack parameters (used in the help message)
-STACK_PARAMS_NAMES=( Version EnvName KeyPair BaseAMI InstanceType DBUser DBPwd AvSchedSecret HealthCheckGracePeriod )
+STACK_PARAMS_NAMES=( Version EnvName BaseAMI InstanceType DBUser DBPwd AvSchedSecret HealthCheckGracePeriod )
 
 # List of secured stack parameters (used to hide the value of the parameters)
-SECURED_STACK_PARAMS_NAMES=( DBPwd )
+SECURED_STACK_PARAMS_NAMES=( DBPwd AvSchedSecret )
 
 
 # ----------------------------------------------------------------------------------------

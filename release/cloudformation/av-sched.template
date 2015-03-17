@@ -7,6 +7,7 @@
 
         "EnvName" :                 { "Type" : "String", "Description" : "from net stack" },
         "EnvType" :                 { "Type" : "String", "Description" : "from net stack" },
+        "KeyPair" :                 { "Type" : "String", "Description" : "from net stack" },
         "PrivateSubnetA" :          { "Type" : "String", "Description" : "from net stack" },
         "PrivateSubnetB" :          { "Type" : "String", "Description" : "from net stack" },
         "PrivateSubnetC" :          { "Type" : "String", "Description" : "from net stack" },
@@ -15,11 +16,6 @@
         "Version" : {
             "Description" : "The version of the application: used to pull docker image.",
             "Type" : "String"
-        },
-
-        "KeyPair" : {
-            "Description" : "Amazon EC2 Key Pair",
-            "Type" : "AWS::EC2::KeyPair::KeyName"
         },
 
         "BaseAMI": {
@@ -63,10 +59,6 @@
  
     "Outputs": {
         "AvSchedDNS":      { "Description": "Domain name of av-sched",       "Value": { "Ref": "AvSchedDNS"} }
-    },
-
-    "Conditions" : {
-        "UseAvDataStub" : { "Fn::Equals": [ { "Ref" : "UseDataStub" } , "true" ] }
     },
 
     "Resources": {
