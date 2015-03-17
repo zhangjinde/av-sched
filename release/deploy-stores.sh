@@ -7,28 +7,26 @@ AV_REPO_PATH=s3://av-repo
 AV_REPO_URL=https://s3-eu-west-1.amazonaws.com/av-repo
 
 # Name of the repo where to upload the resources (artifact, template, ...)
-REPO_NAME=av-sched
+REPO_NAME=av-sched-stores
 
 # Name of the cloudformation template
-TEMPLATE_NAME=av-sched.template
+TEMPLATE_NAME=av-sched-stores.template
 
-# Default values for EnvName, KeyPair, BaseAMI
+# Default values for EnvName
 declare -A DEFAULT_PARAMS
 DEFAULT_PARAMS[EnvName]=dev
-DEFAULT_PARAMS[KeyPair]=dev
-DEFAULT_PARAMS[BaseAMI]=ami-cbe87bbc
 
 # Configuration files located on AWS S3 buckets
 # The name of the configuration to be used is defined by the argument '--aws-cfg <ConfigName>'
 # AWS_S3_BUCKETS[ConfigName]="s3://...""
 declare -A AWS_S3_BUCKETS
-AWS_S3_BUCKETS[preprod]="s3://av-preprod-secrets/files/config/av-sched.cfg"
+AWS_S3_BUCKETS[preprod]="s3://av-preprod-secrets/files/config/av-sched-stores.cfg"
 
 # List of the network parameters to extract
-NETWORK_PARAMS_NAMES=( PrivateSubnetA PrivateSubnetB PrivateSubnetC PrivateSecurityGroup EnvType )
+NETWORK_PARAMS_NAMES=( PrivateSubnetA PrivateSubnetB PrivateSubnetC PrivateSecurityGroup )
 
 # List of stack parameters (used in the help message)
-STACK_PARAMS_NAMES=( Version EnvName KeyPair BaseAMI InstanceType DBUser DBPwd AvSchedSecret HealthCheckGracePeriod )
+STACK_PARAMS_NAMES=( Version EnvName DBInstanceClass DBStorageType DBAllocatedStorage DBIops DBUser DBPwd )
 
 # List of secured stack parameters (used to hide the value of the parameters)
 SECURED_STACK_PARAMS_NAMES=( DBPwd )
@@ -44,40 +42,24 @@ SECURED_STACK_PARAMS_NAMES=( DBPwd )
 function init_variables {
     ENV_NAME=$(get_parameter EnvName)
     NETWORK_STACK=$ENV_NAME-net
-    STACK_NAME=$ENV_NAME-av-sched
-
-    # Get the parameter 'Version'. If the parameter is not defined then a value will be generated.
+    STACK_NAME=$ENV_NAME-av-sched-stores
+    
     VERSION=$(get_parameter Version $ENV_NAME-`date -u +%Y%m%d%H%M%S`)
-    # Set the parameter 'Version' to be sure the generated value is taken into account.
-    set_parameter Version $VERSION
 }
 
 # ----------------------------------------------------------------------------------------
 # 
 # Build all required artifacts for your application and upload them on S3.
-# 
 # This function is only called if the command line parameter '-build' is used.
 # 
 # ----------------------------------------------------------------------------------------
 
 function build {
 
-    print "Build Artifact" 6
-
-    initial_dir=`pwd`
-    
-    cd $CURRENT_DIR/..
-    mvn clean package -q
-
-    # Back to the initial directory
-    cd $initial_dir
-
-    # --------
-
     print "Upload resources to S3" 6
 
+    print "Uploading cloudformation" 2
     aws s3 cp $CURRENT_DIR/cloudformation/$TEMPLATE_NAME $AV_REPO_PATH/deployments/$REPO_NAME/$VERSION/cloudformation/
-    aws s3 cp $CURRENT_DIR/../target/av-sched-*-exec.jar $AV_REPO_PATH/apps/$REPO_NAME/$VERSION/artifacts/av-sched.jar
 }
 
 # ----------------------------------------------------------------------------------------
@@ -92,14 +74,6 @@ function build {
 function check_before_deploy {
 
     print "Check resources" 6
-
-    # Check if the artifact exists for the specified version
-    local artifact_exists=`aws s3 ls $AV_REPO_PATH/apps/$REPO_NAME/$VERSION/artifacts/av-sched.jar`
-    if [ -z "$artifact_exists" ]
-    then
-        echo "No artifact found for the version: $VERSION"
-        exit 1
-    fi
 }
 
 

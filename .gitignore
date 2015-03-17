@@ -3,3 +3,4 @@ bin
 target
 conf/deploy-sched-local.properties
 node_modules
+release/deploy-tools.sh
