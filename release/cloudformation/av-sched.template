@@ -192,10 +192,10 @@
                                 "#cloud-config\n\n",
                                 "coreos:\n",
 
-                                "  update:\n",
+                                " update:\n",
                                 "    reboot-strategy: off\n",
 
-                                "  units:\n",
+                                " units:\n",
 
                                 " - name: av-keys.timer\n",
                                 "   command: start\n",
