@@ -1,6 +1,6 @@
 {
     "AWSTemplateFormatVersion": "2010-09-09",
-    
+
     "Description": "AirVantage Scheduling service",
 
     "Parameters" : {
@@ -56,7 +56,7 @@
             "Type": "String"
         }
     },
- 
+
     "Outputs": {
         "AvSchedDNS":      { "Description": "Domain name of av-sched",       "Value": { "Ref": "AvSchedDNS"} }
     },
@@ -94,10 +94,10 @@
                 },
                 "Listeners": [ {
                     "InstancePort": 8086,
-                    "LoadBalancerPort": 8086,
+                    "LoadBalancerPort": 80,
                     "Protocol": "HTTP"
                 } ]
-            } 
+            }
         },
 
         "AvSchedAutoScale": {
@@ -116,8 +116,8 @@
                 "MaxSize": 2,
                 "MinSize": 1,
                 "DesiredCapacity": 1,
-                "Tags": [ { 
-                    "Key": "Name", 
+                "Tags": [ {
+                    "Key": "Name",
                     "Value": { "Fn::Join" : ["", [ { "Ref": "EnvName" }, "-av-sched-asg" ] ] },
                     "PropagateAtLaunch": true
                 } ]
@@ -133,7 +133,7 @@
         "AvSchedRole": {
             "Type": "AWS::IAM::Role",
             "Properties": {
-                "AssumeRolePolicyDocument": { 
+                "AssumeRolePolicyDocument": {
                     "Version" : "2012-10-17",
                     "Statement": [ {
                         "Effect": "Allow",
@@ -182,7 +182,7 @@
                 "IamInstanceProfile": { "Ref": "AvSchedInstanceProfile" },
                 "BlockDeviceMappings" : [ {
                     "DeviceName" : "/dev/xvda",
-                    "Ebs" : { "VolumeSize" : "50", "VolumeType": "gp2" } 
+                    "Ebs" : { "VolumeSize" : "50", "VolumeType": "gp2" }
                 } ],
                 "UserData": {
                     "Fn::Base64": {
