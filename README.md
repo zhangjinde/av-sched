@@ -63,7 +63,7 @@ Obviously, this secret should remain, *ahem*, [secret](http://uncyclopedia.wikia
 ### Schedule a job
 
 ~~~
-POST host:8086/sched/api/job
+POST host:8086/sched/api/job-def
 {
   "id" : "av-server/timers",
   "url" : "http://murphy:3000/echo",
@@ -75,13 +75,51 @@ POST host:8086/sched/api/job
 }
 ~~~
 
-### Ack a job
+### Unschedule a job
 
 ~~~
-POST host:8086/sched/api/job
+DELETE host:8086/sched/api/job-def
 {
   "id" : "av-server/timers"
 }
+~~~
+
+### Ack a job
+
+~~~
+POST host:8086/sched/api/job-action/ack
+{
+  "id" : "av-server/timers"
+}
+~~~
+
+### List scheduled jobid
+
+~~~
+GET host:8086/sched/api/job
+[ {
+  "config" : {
+    "id" : "test-job-1426783470991",
+    "url" : "http://localhost:3030/test/test-job-1426783470991",
+    "timeout" : 60000
+  },
+  "lock" : {
+    "locked" : true,
+    "expiresAt" : 1426783532000,
+    "expired" : true
+  }
+}, {
+  "config" : {
+    "id" : "test-job-1426783460784",
+    "url" : "http://localhost:3020/test/test-job-1426783460784",
+    "timeout" : 60000
+  },
+  "lock" : {
+    "locked" : true,
+    "expiresAt" : 1426783530000,
+    "expired" : true
+  }
+} ]
 ~~~
 
 ## Functionnal Tests

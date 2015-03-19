@@ -11,12 +11,22 @@ public class SchedApp {
 
     private static final Logger LOG = LoggerFactory.getLogger(SchedApp.class);
 
+    private boolean clean = false;
+    
     public SchedApp(String[] args) {
+        if (args.length > 0 && "--clear".equals(args[0])) {
+            this.clean = true;
+        }
+        
     }
 
     public void start(WebAppContextBuilder contextBuilder) throws Exception {
         ServiceLocator.getInstance().init();
 
+        if (this.clean) {
+            ServiceLocator.getInstance().getJobService().clean();
+        }
+        
         long start = System.currentTimeMillis();
         JobDefServlet.startupTime = start;
 

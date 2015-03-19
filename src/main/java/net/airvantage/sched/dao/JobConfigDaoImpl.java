@@ -22,10 +22,15 @@ public class JobConfigDaoImpl implements JobConfigDao {
     
     @Override
     public void saveJobConfig (JobConfig config) throws SQLException {
-        queryRunner.update("delete from sched_job_configs where id=?", config.getId());
+        removeJobConfig(config.getId());
         queryRunner.update("insert into sched_job_configs(id,url,timeout) values(?,?,?)", config.getId(),
                 config.getUrl(), config.getTimeout());
 
+    }
+    
+    @Override
+    public void removeJobConfig(String jobId) throws SQLException {
+        queryRunner.update("delete from sched_job_configs where id=?", jobId);
     }
     
     @Override
@@ -72,4 +77,8 @@ public class JobConfigDaoImpl implements JobConfigDao {
 
     }
 
+    @Override
+    public void removeAll() throws SQLException {
+        queryRunner.update("delete from sched_job_configs");
+    }
 }

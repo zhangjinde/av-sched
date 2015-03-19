@@ -80,4 +80,9 @@ public class JobLockDaoImpl implements JobLockDao {
         return queryRunner.query("select id, expires_at from sched_job_locks", rsh);
     }
 
+    @Override
+    public void removeAll() throws SQLException {
+        queryRunner.update("delete from sched_job_locks");
+    }
+    
 }

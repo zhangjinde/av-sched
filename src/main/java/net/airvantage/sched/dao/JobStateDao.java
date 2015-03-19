@@ -10,6 +10,8 @@ public interface JobStateDao {
 
     public void saveJobDef(JobDef jobDef) throws AppException;
 
+    public void deleteJobDef(String jobId) throws AppException;
+    
     public JobState findJobState(String id) throws AppException;
 
     public List<JobState> getJobStates() throws AppException;
@@ -17,4 +19,7 @@ public interface JobStateDao {
     public void lockJob(String id) throws AppException;
 
     public void unlockJob(String id) throws AppException;
+
+    public void removeAll() throws AppException;
+
 }

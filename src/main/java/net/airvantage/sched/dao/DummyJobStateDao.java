@@ -1,13 +1,10 @@
 package net.airvantage.sched.dao;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.google.common.collect.Lists;
 
 import net.airvantage.sched.app.AppException;
 import net.airvantage.sched.model.JobDef;
@@ -26,10 +23,22 @@ public class DummyJobStateDao implements JobStateDao {
     }
 
     @Override
+    public void deleteJobDef(String jobId) throws AppException {
+        if (states.containsKey(jobId)) {
+            states.remove(jobId);
+        }
+    }
+    
+    @Override
     public JobState findJobState(String id) {
         return states.get(id);
     }
 
+    @Override
+    public void removeAll() throws AppException {
+        states.clear();
+    }
+    
     @Override
     public void lockJob(String id) {
         

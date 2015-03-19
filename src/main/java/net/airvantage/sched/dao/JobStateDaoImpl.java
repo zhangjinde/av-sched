@@ -45,6 +45,17 @@ public class JobStateDaoImpl implements JobStateDao {
     }
 
     @Override
+    public void deleteJobDef(String jobId) throws AppException {
+        try {
+            this.jobConfigDao.removeJobConfig(jobId);
+            this.jobLockDao.removeLock(jobId);
+        } catch (SQLException e) {
+            LOG.error(String.format("Unable to delete job state {}", jobId), e);
+            throw AppException.serverError(e);
+        }
+    }
+    
+    @Override
     public JobState findJobState(String id) throws AppException {
 
         JobConfig config = null;
@@ -127,6 +138,16 @@ public class JobStateDaoImpl implements JobStateDao {
         } catch (SQLException e) {
             LOG.error(String.format("Unable to lock job state with id", id), e);
             throw AppException.serverError(e);
+        }
+    }
+
+    @Override
+    public void removeAll() throws AppException {
+        try {
+            this.jobLockDao.removeAll();
+            this.jobConfigDao.removeAll();
+        } catch (SQLException e) {
+            throw new AppException("clear.error", e);
         }
     }
 

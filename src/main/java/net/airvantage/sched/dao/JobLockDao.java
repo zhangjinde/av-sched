@@ -15,4 +15,6 @@ public interface JobLockDao {
 
     public abstract void removeLock(String id) throws SQLException;
 
+    public abstract void removeAll() throws SQLException;
+
 }

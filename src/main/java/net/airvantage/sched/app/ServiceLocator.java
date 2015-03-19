@@ -4,6 +4,8 @@ import javax.sql.DataSource;
 
 import net.airvantage.sched.conf.ConfigurationManager;
 import net.airvantage.sched.conf.Keys;
+import net.airvantage.sched.dao.JobConfigDaoImpl;
+import net.airvantage.sched.dao.JobLockDaoImpl;
 import net.airvantage.sched.dao.JobStateDao;
 import net.airvantage.sched.dao.JobStateDaoImpl;
 import net.airvantage.sched.db.SchemaMigrator;
@@ -17,9 +19,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
-import org.quartz.SchedulerFactory;
 import org.quartz.TriggerListener;
-import org.quartz.impl.StdSchedulerFactory;
 
 public class ServiceLocator {
 
