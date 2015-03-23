@@ -150,9 +150,12 @@ var sched = {
         return function() {
             return sched.getJobs().then(function(jobs) {
                 var job = sched.findJob(jobId, jobs);
-                assert.ok(job, "A job with the right id should have been found");
-                if (test) {
-                    assert.equal(test.locked, job.lock.locked, "Expected lock state :" + test.locked);
+                assert.ok(job, "A job with the id " + jobId + " should have been found");
+                if (test && test.lock) {
+                    assert.equal(test.lock.locked, job.lock.locked, "Expected lock state :" + test.lock.locked);
+                }
+                if (test && test.scheduling) {
+                    assert.deepEqual(test.scheduling, job.scheduling, "Expected job scheduling : " + test.scheduling);
                 }
             });
         };

@@ -1,4 +1,5 @@
 var sched = require("./sched.js");
+var assert = require("chai").assert;
 
 describe("av-sched", function() {
 
@@ -48,7 +49,7 @@ describe("av-sched", function() {
 
     });
 
-    it("can list jobs", function() {
+    it.only("can list jobs", function() {
 
         console.log("Testing list of jobs...");
 
@@ -56,14 +57,24 @@ describe("av-sched", function() {
         then(sched.checkHasNoJobState(jobId))
             .then(sched.scheduleJob(state, jobId, 2, secret))
             .then(sched.checkHasJobState(jobId, {
-                locked: false
+                scheduling : {
+                    type : "cron",
+                    value : "0/2 0/1 * 1/1 * ? *"
+                },
+                lock : {
+                    locked: false
+                }
             }))
-            .then(sched.waitFor(2))
+            .then(sched.waitFor(3))
             .then(sched.checkHasJobState(jobId, {
-                locked: true
-            }))
-            .
-        catch (sched.stopListener(state));
+                scheduling : {
+                    type : "cron",
+                    value : "0/2 0/1 * 1/1 * ? *"
+                },
+                lock : {
+                    locked : true
+                }
+            }));
 
     });
 

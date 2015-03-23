@@ -10,6 +10,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,7 +23,7 @@ public class PostHttpJob implements Job {
     private String schedSecret;
 
     
-    public PostHttpJob() {
+    public PostHttpJob() throws SchedulerException {
         this(ServiceLocator.getInstance().getHttpClient(),
                 ServiceLocator.getInstance().getJobStateDao(),
                 ServiceLocator.getInstance().getSchedSecret());

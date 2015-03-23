@@ -4,7 +4,7 @@ var babelify = require('babelify');
 var util = require('gulp-util');
 var buffer = require('vinyl-buffer');
 var source = require('vinyl-source-stream');
-var uglify = require('gulp-uglify');
+// var uglify = require('gulp-uglify');
 var sourcemaps = require('gulp-sourcemaps');
 var watchify = require("watchify");
 
@@ -15,7 +15,8 @@ gulp.task('dev', function() {
     b.on("update", function () {
         bundle(b);
     });
-    b.add("./src/main/es6/main.js");
+    b.on('log', util.log.bind(util));
+    b.add("./src/main/es6/app.js");
 
     bundle(b);
 });
@@ -25,27 +26,30 @@ gulp.task('build', function() {
     bundle(b);
 });
 
+function getBrowserify() {
+    return browserify('./src/main/es6/app.js', {
+        debug: true
+    })
+        // .add(require.resolve('babel/polyfill'))
+        .transform(babelify);
+}
+
 function bundle(b) {
     b.bundle()
         .on('error', util.log.bind(util, 'Browserify Error'))
-        .pipe(source('main.js'))
+        .pipe(source('app.js'))
+
         .pipe(buffer())
         .pipe(sourcemaps.init({
             loadMaps: true
         }))
+/*
         .pipe(uglify({
             mangle: false
         }))
+*/
         .pipe(sourcemaps.write('./'))
         .pipe(gulp.dest('./src/main/webapp/public/dist/js'));
-}
-
-function getBrowserify() {
-    return browserify('./src/main/es6/main.js', {
-        debug: true
-    })
-        .add(require.resolve('babel/polyfill'))
-        .transform(babelify);
 }
 
 gulp.task('default', ['dev']);

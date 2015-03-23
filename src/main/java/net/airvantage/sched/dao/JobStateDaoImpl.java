@@ -4,7 +4,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -13,10 +12,12 @@ import net.airvantage.sched.app.AppException;
 import net.airvantage.sched.model.JobConfig;
 import net.airvantage.sched.model.JobDef;
 import net.airvantage.sched.model.JobLock;
+import net.airvantage.sched.model.JobScheduling;
 import net.airvantage.sched.model.JobState;
 
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.ResultSetHandler;
+import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,9 +29,12 @@ public class JobStateDaoImpl implements JobStateDao {
 
     private JobConfigDao jobConfigDao;
 
-    public JobStateDaoImpl(JobConfigDao jobConfigDao, JobLockDao jobLockDao) {
+    private JobSchedulingDao jobSchedulingDao;
+
+    public JobStateDaoImpl(JobConfigDao jobConfigDao, JobLockDao jobLockDao, JobSchedulingDao jobSchedulingDao) {
         this.jobLockDao = jobLockDao;
         this.jobConfigDao = jobConfigDao;
+        this.jobSchedulingDao = jobSchedulingDao;
     }
 
     @Override
@@ -62,7 +66,7 @@ public class JobStateDaoImpl implements JobStateDao {
     public JobState findJobState(String id) throws AppException {
 
         JobConfig config = null;
-        JobLock lock= null;
+        JobLock lock = null;
         JobState state = null;
         try {
             config = this.jobConfigDao.findJobConfig(id);
@@ -76,7 +80,7 @@ public class JobStateDaoImpl implements JobStateDao {
             state.setConfig(config);
             state.setLock(lock);
         }
-        
+
         return state;
     }
 
@@ -107,6 +111,54 @@ public class JobStateDaoImpl implements JobStateDao {
             LOG.error(String.format("Unable to lock job state with id", id), e);
             throw AppException.serverError(e);
         }
+    }
+
+    @Override
+    public List<JobState> getJobStates() throws AppException {
+
+        List<JobState> states = new ArrayList<JobState>();
+
+        try {
+            Map<String, JobConfig> jobConfigs = this.jobConfigDao.jobConfigsById();
+            Map<String, JobLock> jobLocks = this.jobLockDao.jobLocksById();
+            Map<String, JobScheduling> jobSchedulings = this.jobSchedulingDao.jobSchedulingsById();
+            
+            for (Entry<String, JobConfig> entry : jobConfigs.entrySet()) {
+                String id = entry.getKey();
+                JobConfig jobConfig = entry.getValue();
+
+                JobState state = new JobState();
+                state.setConfig(jobConfig);
+
+                if (jobLocks.containsKey(id)) {
+                    JobLock jobLock = jobLocks.get(id);
+                    state.setLock(jobLock);
+                } else {
+                    state.setLock(new JobLock());
+                }
+                
+                if (jobSchedulings.containsKey(id)) {
+                    JobScheduling jobScheduling = jobSchedulings.get(id);
+                    state.setScheduling(jobScheduling);
+                } else {
+                    state.setScheduling(new JobScheduling());
+                }
+                
+                states.add(state);
+
+                
+            }
+
+        } catch (SQLException e) {
+            LOG.error(String.format("Unable to find job states"), e);
+            throw AppException.serverError(e);
+        } catch (SchedulerException e) {
+            LOG.error(String.format("Unable to find job states"), e);
+            throw AppException.serverError(e);
+        }
+
+        return states;
+
     }
 
     @Override

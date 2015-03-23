@@ -7,7 +7,7 @@ import net.airvantage.sched.app.AppException;
 import net.airvantage.sched.dao.JobStateDao;
 import net.airvantage.sched.model.JobDef;
 import net.airvantage.sched.model.JobId;
-import net.airvantage.sched.model.JobSchedulingDef;
+import net.airvantage.sched.model.JobScheduling;
 import net.airvantage.sched.model.JobSchedulingType;
 import net.airvantage.sched.quartz.PostHttpJob;
 
@@ -110,7 +110,7 @@ public class JobServiceImpl implements JobService {
         return trigger;
     }
 
-    protected static ScheduleBuilder<? extends Trigger> scheduleBuilder(JobSchedulingDef schedulingDef)
+    protected static ScheduleBuilder<? extends Trigger> scheduleBuilder(JobScheduling schedulingDef)
             throws AppException {
         ScheduleBuilder<? extends Trigger> res = null;
         if (schedulingDef.getType() == JobSchedulingType.CRON) {

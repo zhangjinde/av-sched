@@ -3,7 +3,7 @@ package net.airvantage.sched;
 import net.airvantage.sched.model.JobConfig;
 import net.airvantage.sched.model.JobDef;
 import net.airvantage.sched.model.JobLock;
-import net.airvantage.sched.model.JobSchedulingDef;
+import net.airvantage.sched.model.JobScheduling;
 import net.airvantage.sched.model.JobSchedulingType;
 import net.airvantage.sched.model.JobState;
 
@@ -33,8 +33,8 @@ public class TestUtils {
         return jobDef;
     }
 
-    public static JobSchedulingDef cronJobSchedulingDef() {
-        JobSchedulingDef schedDef = new JobSchedulingDef();
+    public static JobScheduling cronJobSchedulingDef() {
+        JobScheduling schedDef = new JobScheduling();
         schedDef.setType(JobSchedulingType.CRON);
         schedDef.setValue("0 0 6 1 1/12 ? *");
         return schedDef;

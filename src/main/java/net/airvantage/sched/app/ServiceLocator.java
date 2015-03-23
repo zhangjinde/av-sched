@@ -4,6 +4,9 @@ import javax.sql.DataSource;
 
 import net.airvantage.sched.conf.ConfigurationManager;
 import net.airvantage.sched.conf.Keys;
+import net.airvantage.sched.dao.JobConfigDaoImpl;
+import net.airvantage.sched.dao.JobLockDaoImpl;
+import net.airvantage.sched.dao.JobSchedulingDaoImpl;
 import net.airvantage.sched.dao.JobStateDao;
 import net.airvantage.sched.dao.JobStateDaoImpl;
 import net.airvantage.sched.db.SchemaMigrator;
@@ -17,9 +20,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
-import org.quartz.SchedulerFactory;
 import org.quartz.TriggerListener;
-import org.quartz.impl.StdSchedulerFactory;
 
 public class ServiceLocator {
 
@@ -59,10 +60,12 @@ public class ServiceLocator {
         return configManager;
     }
 
-    public JobStateDao getJobStateDao() {
+    public JobStateDao getJobStateDao() throws SchedulerException {
         if (jobStateDao == null) {
             DataSource dataSource = getDataSource();
-            jobStateDao = new JobStateDaoImpl(new JobConfigDaoImpl(dataSource), new JobLockDaoImpl(dataSource));
+            jobStateDao = new JobStateDaoImpl(new JobConfigDaoImpl(dataSource), 
+                    new JobLockDaoImpl(dataSource),
+                    new JobSchedulingDaoImpl(getScheduler()));
 
             // jobStateDao = new DummyJobStateDao();
         }
@@ -101,7 +104,7 @@ public class ServiceLocator {
         return scheduler;
     }
 
-    private TriggerListener getLockTriggerListener() {
+    private TriggerListener getLockTriggerListener() throws SchedulerException {
         return new LockTriggerListener(getJobStateDao());
     }
 

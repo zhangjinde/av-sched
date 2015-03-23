@@ -8,6 +8,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.quartz.SchedulerException;
+
 import net.airvantage.sched.dao.JobStateDao;
 import net.airvantage.sched.model.JobState;
 
@@ -28,7 +30,11 @@ public class JobStateServlet extends HttpServlet {
     @Override
     public void init() throws ServletException {
         JACKSON.enable(SerializationFeature.INDENT_OUTPUT);
-        jobStateDao = ServiceLocator.getInstance().getJobStateDao();
+        try {
+            jobStateDao = ServiceLocator.getInstance().getJobStateDao();
+        } catch (SchedulerException e) {
+            throw new ServletException(e);
+        }
         
     }
     
