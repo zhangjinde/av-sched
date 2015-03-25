@@ -1,34 +1,28 @@
 package net.airvantage.sched.db;
 
-import java.io.File;
-
 import javax.sql.DataSource;
 
-import org.apache.ibatis.migration.DataSourceConnectionProvider;
-import org.apache.ibatis.migration.FileMigrationLoader;
-import org.apache.ibatis.migration.operations.BootstrapOperation;
-import org.apache.ibatis.migration.operations.UpOperation;
+import org.flywaydb.core.Flyway;
 
+/**
+ * SchemaMigrator using Flyway.
+ * 
+ * The migrations are in src/main/resources/db/migration.
+ * 
+ * Note that flyway supports clustering by default :http://flywaydb.org/documentation/faq.html#parallel 
+ * 
+ */
 public class SchemaMigrator {
 
-    private DataSourceConnectionProvider dataSourceConnectionProvider;
-    private FileMigrationLoader fileMigrationLoader;
+    private Flyway flyway;
 
     public SchemaMigrator(DataSource dataSource) {
-        dataSourceConnectionProvider = new DataSourceConnectionProvider(dataSource);
-        fileMigrationLoader = new FileMigrationLoader(new File("src/main/resources/migrations"), "utf-8", null);
-    }
-
-    public void bootstrap() {
-        new LockOperation().operate(dataSourceConnectionProvider, fileMigrationLoader, null, null);
-        new BootstrapOperation(true).operate(dataSourceConnectionProvider, fileMigrationLoader, null, null);
-        new UnlockOperation().operate(dataSourceConnectionProvider, fileMigrationLoader, null, null);
+        this.flyway = new Flyway();
+        flyway.setDataSource(dataSource);
     }
 
     public void migrate() {
-        new LockOperation().operate(dataSourceConnectionProvider, fileMigrationLoader, null, null);
-        new UpOperation().operate(dataSourceConnectionProvider, fileMigrationLoader, null, null);
-        new UnlockOperation().operate(dataSourceConnectionProvider, fileMigrationLoader, null, null);
+        flyway.migrate();
     }
 
 }

@@ -1,0 +1,286 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+
+    "Description": "AirVantage Scheduling service",
+
+    "Parameters" : {
+
+        "EnvName" :                 { "Type" : "String", "Description" : "from net stack" },
+        "EnvType" :                 { "Type" : "String", "Description" : "from net stack" },
+        "KeyPair" :                 { "Type" : "String", "Description" : "from net stack" },
+        "PrivateSubnetA" :          { "Type" : "String", "Description" : "from net stack" },
+        "PrivateSubnetB" :          { "Type" : "String", "Description" : "from net stack" },
+        "PrivateSubnetC" :          { "Type" : "String", "Description" : "from net stack" },
+        "PrivateSecurityGroup" :    { "Type" : "String", "Description" : "from net stack" },
+
+        "Version" : {
+            "Description" : "The version of the application: used to pull docker image.",
+            "Type" : "String"
+        },
+
+        "BaseAMI": {
+            "Description" : "Base AMI used to launch av-sched",
+            "Type": "String"
+        },
+
+        "InstanceType" : {
+            "Description" : "EC2 instance type",
+            "Type" : "String",
+            "Default" : "t2.medium",
+            "AllowedValues" : [ "t2.micro", "t2.small", "t2.medium", "m3.medium", "m3.large", "m3.xlarge", "m3.2xlarge" ],
+            "ConstraintDescription" : "must be a valid EC2 instance type."
+        },
+
+        "DBUser" : {
+            "Description" : "Database user",
+            "Type" : "String",
+            "Default": "admin",
+            "NoEcho" : "true"
+        },
+
+        "DBPwd" : {
+            "Description" : "Database password",
+            "Type" : "String",
+            "Default": "changeit",
+            "NoEcho" : "true"
+        },
+
+        "HealthCheckGracePeriod" : {
+            "Description" : "AutoScalingGroup HealthCheckGracePeriod property (seconds)",
+            "Type" : "Number",
+            "Default" : 1200
+        },
+
+        "AvSchedSecret": {
+            "Description": "Shared String between av-sched and its clients",
+            "Type": "String"
+        }
+    },
+
+    "Outputs": {
+        "AvSchedDNS":      { "Description": "Domain name of av-sched",       "Value": { "Ref": "AvSchedDNS"} }
+    },
+
+    "Resources": {
+
+        "AvSchedDNS" : {
+            "Type" : "AWS::Route53::RecordSet",
+            "Properties" : {
+                "HostedZoneName" : { "Fn::Join" : ["", [ { "Ref": "EnvName" }, "-airvantage.net." ] ] },
+                "Name" : { "Fn::Join" : ["", [ "av-sched.", { "Ref": "EnvName" }, "-airvantage.net" ] ] },
+                "Type" : "CNAME",
+                "TTL" : "900",
+                "ResourceRecords" : [ { "Fn::GetAtt" : [ "AvSchedELB", "DNSName" ] } ]
+            }
+        },
+
+        "AvSchedELB": {
+            "Type": "AWS::ElasticLoadBalancing::LoadBalancer",
+            "Properties": {
+                "LoadBalancerName": { "Fn::Join" : ["", [ { "Ref": "EnvName" }, "-av-sched-public-elb" ] ] },
+                "SecurityGroups": [{"Ref": "PrivateSecurityGroup"}],
+                "CrossZone": true,
+                "Subnets": [
+                    { "Ref": "PrivateSubnetA" },
+                    { "Ref": "PrivateSubnetB" },
+                    { "Ref": "PrivateSubnetC" }
+                ],
+                "HealthCheck": {
+                    "Target": "HTTP:8086/",
+                    "Timeout": 2,
+                    "Interval": 5,
+                    "UnhealthyThreshold": 6,
+                    "HealthyThreshold": 2
+                },
+                "Listeners": [ {
+                    "InstancePort": 8086,
+                    "LoadBalancerPort": 80,
+                    "Protocol": "HTTP"
+                } ]
+            }
+        },
+
+        "AvSchedAutoScale": {
+            "Type": "AWS::AutoScaling::AutoScalingGroup",
+            "Properties": {
+                "AvailabilityZones": { "Fn::GetAZs": "" },
+                "VPCZoneIdentifier": [
+                    { "Ref": "PrivateSubnetA" },
+                    { "Ref": "PrivateSubnetB" },
+                    { "Ref": "PrivateSubnetC" }
+                ],
+                "HealthCheckGracePeriod": {"Ref": "HealthCheckGracePeriod"},
+                "HealthCheckType": "ELB",
+                "LaunchConfigurationName": { "Ref": "AvSchedLaunchConfig" },
+                "LoadBalancerNames": [ { "Ref": "AvSchedELB" } ],
+                "MaxSize": 2,
+                "MinSize": 1,
+                "DesiredCapacity": 1,
+                "Tags": [ {
+                    "Key": "Name",
+                    "Value": { "Fn::Join" : ["", [ { "Ref": "EnvName" }, "-av-sched-asg" ] ] },
+                    "PropagateAtLaunch": true
+                } ]
+            },
+            "UpdatePolicy": {
+                "AutoScalingRollingUpdate": {
+                    "MaxBatchSize": 1,
+                    "PauseTime": "PT5M"
+                }
+            }
+        },
+
+        "AvSchedRole": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+                "AssumeRolePolicyDocument": {
+                    "Version" : "2012-10-17",
+                    "Statement": [ {
+                        "Effect": "Allow",
+                        "Principal": {
+                            "Service": [ "ec2.amazonaws.com" ]
+                        },
+                        "Action": [ "sts:AssumeRole" ]
+                    } ]
+                },
+                "Path": "/",
+                "Policies": [ {
+                    "PolicyName": "root",
+                    "PolicyDocument": {
+                        "Version" : "2012-10-17",
+                        "Statement": [ {
+                            "Effect": "Allow",
+                            "Action": [ "s3:Get*", "s3:List*" ],
+                            "Resource": [{ "Fn::Join" : [ "", [ "arn:aws:s3:::av-" , { "Ref": "EnvType" }, "-secrets" ] ] },
+                                         { "Fn::Join" : [ "", [ "arn:aws:s3:::av-" , { "Ref": "EnvType" }, "-secrets/*" ] ] }]
+                        },
+                        {
+                            "Effect": "Allow",
+                            "Action": [ "s3:*" ],
+                            "Resource": "arn:aws:s3:::av-repo/*"
+                        } ]
+                    }
+               } ]
+            }
+        },
+
+        "AvSchedInstanceProfile": {
+            "Type": "AWS::IAM::InstanceProfile",
+            "Properties": {
+                "Path": "/",
+                "Roles": [ { "Ref": "AvSchedRole" } ]
+            }
+        },
+
+        "AvSchedLaunchConfig": {
+            "Type": "AWS::AutoScaling::LaunchConfiguration",
+            "Properties": {
+                "ImageId": { "Ref" : "BaseAMI" },
+                "InstanceType": { "Ref": "InstanceType" },
+                "KeyName": { "Ref": "KeyPair" },
+                "SecurityGroups": [ { "Ref": "PrivateSecurityGroup" } ],
+                "IamInstanceProfile": { "Ref": "AvSchedInstanceProfile" },
+                "BlockDeviceMappings" : [ {
+                    "DeviceName" : "/dev/xvda",
+                    "Ebs" : { "VolumeSize" : "50", "VolumeType": "gp2" }
+                } ],
+                "UserData": {
+                    "Fn::Base64": {
+                        "Fn::Join": [
+                            "",
+                            [
+                                "#cloud-config\n\n",
+                                "coreos:\n",
+
+                                " update:\n",
+                                "    reboot-strategy: off\n",
+
+                                " units:\n",
+
+                                " - name: av-keys.timer\n",
+                                "   command: start\n",
+
+                                " - name: av-log.service\n",
+                                "   command: start\n",
+
+                                " - name: download-av-sched-jar.service\n",
+                                "   command: start\n",
+                                "   content: |\n",
+                                "     [Unit]\n",
+                                "     Description=download-av-sched-jar\n",
+                                "     After=docker.service\n",
+                                "     Requires=docker.service\n", "\n",
+                                "     [Service]\n",
+                                "     WorkingDirectory=/home/core/\n",
+                                "     Type=oneshot\n",
+                                "     RemainAfterExit=yes\n",
+                                "     User=core\n",
+                                "     ExecStart=/opt/bin/aws s3 cp s3://av-repo/apps/av-sched/", { "Ref": "Version" }, "/artifacts/av-sched.jar ./av-sched/\n",
+                                "     [Install]\n",
+                                "     WantedBy=multi-user.target\n",
+
+                                " - name: av-sched.service\n",
+                                "   command: start\n",
+                                "   content: |\n",
+                                "     [Unit]\n",
+                                "     Description=av-sched\n",
+                                "     After=av-log.service\n",
+                                "     After=download-av-sched-jar.service\n" , "\n",
+                                "     [Service]\n",
+                                "     User=core\n",
+                                "     TimeoutStartSec=0\n",
+                                "     Restart=on-failure\n",
+                                "     RestartSec=5\n",
+                                "     ExecStartPre=-/usr/bin/docker kill av-sched\n",
+                                "     ExecStartPre=-/usr/bin/docker rm av-sched\n",
+                                "     ExecStart=/usr/bin/docker run --name=av-sched -p 8086:8086 --link av-log:av-log -v /etc/av-sched:/etc/av-sched -v /home/core/av-sched:/var/av-sched --entrypoint /usr/bin/java airvantage/av-java -DAVSCHED_CONF_DIR=/etc/av-sched -Dlogback.configurationFile=/etc/av-sched/logback.xml -jar /var/av-sched/av-sched.jar\n",
+                                "     [Install]\n",
+                                "     WantedBy=multi-user.target\n",
+
+                                "write_files:\n",
+
+                                " - path: /etc/av/environment\n",
+                                "   permissions: '0744'\n",
+                                "   owner: core\n",
+                                "   content: |\n",
+                                "    AV_ENVIRONMENT_TYPE=", { "Ref": "EnvType" }, "\n",
+                                "    AV_ENVIRONMENT_NAME=", { "Ref": "EnvName" }, "\n",
+                                "    AV_APPLICATION=av-sched\n",
+
+                                " - path: /etc/av-sched/deploy-sched-local.properties\n",
+                                "   permissions: '0744'\n",
+                                "   owner: core\n",
+                                "   content: |\n",
+                                "    av-sched.local.tmp.dir=/tmp/log\n",
+                                "    av-sched.version=", { "Ref": "Version" }, "\n",
+                                "    av-sched.secret=", { "Ref": "AvSchedSecret" }, "\n",
+                                "    av-sched.db.server=", { "Fn::Join" : ["", [ "av-sched-db.", { "Ref": "EnvName" }, "-airvantage.net" ] ] }, "\n",
+                                "    av-sched.db.port=3306\n",
+                                "    av-sched.db.dbName=sched\n",
+                                "    av-sched.db.user=", {"Ref" : "DBUser"}, "\n",
+                                "    av-sched.db.password=", {"Ref" : "DBPwd"}, "\n",
+
+                                " - path: /etc/av-sched/logback.xml\n",
+                                "   permissions: 0644\n",
+                                "   owner: core\n",
+                                "   content: |\n",
+                                "    <?xml version=\"1.0\" encoding=\"UTF-8\"?>\n",
+                                "    <configuration scan=\"true\" scanPeriod=\"10 seconds\">\n",
+                                "    <appender name=\"SYSLOG\" class=\"ch.qos.logback.classic.net.SyslogAppender\">\n",
+                                "    <syslogHost>av-log</syslogHost>\n",
+                                "    <facility>LOCAL0</facility>\n",
+                                "    <suffixPattern>av-sched [%-16.16thread] %-32.32logger{32} %msg%n%xException</suffixPattern>\n",
+                                "    <throwableExcluded>true</throwableExcluded>\n",
+                                "    </appender>\n",
+                                "    <root level=\"info\">\n",
+                                "    <appender-ref ref=\"SYSLOG\" />\n",
+                                "    </root>\n",
+                                "    </configuration>\n"
+                            ]
+                        ]
+                    }
+                }
+            }
+        }
+    }
+}
