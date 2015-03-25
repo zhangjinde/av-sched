@@ -3,12 +3,15 @@ package net.airvantage.sched.services;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import net.airvantage.sched.app.AppException;
+import net.airvantage.sched.app.exceptions.AppException;
+import net.airvantage.sched.app.exceptions.AppExceptions;
 import net.airvantage.sched.dao.JobStateDao;
 import net.airvantage.sched.model.JobDef;
 import net.airvantage.sched.model.JobId;
+import net.airvantage.sched.model.JobLock;
 import net.airvantage.sched.model.JobScheduling;
 import net.airvantage.sched.model.JobSchedulingType;
+import net.airvantage.sched.model.JobState;
 import net.airvantage.sched.quartz.PostHttpJob;
 
 import org.quartz.CronScheduleBuilder;
@@ -52,6 +55,28 @@ public class JobServiceImpl implements JobService {
     @Override
     public void ackJob(String jobId) throws AppException {
         this.jobStateDao.unlockJob(jobId);
+    }
+
+    @Override
+    public boolean triggerJob(String jobId) throws AppException {
+        boolean res = false;
+        try {
+            JobState jobState = this.jobStateDao.findJobState(jobId);
+            if (jobState == null) {
+                throw AppExceptions.jobNotFound(jobId);
+            }
+            JobLock lock = jobState.getLock();
+            // Currently locked jobs should not be retriggered
+            if (lock.isLocked() && !lock.isExpired()) {
+                res = false;
+            } else {
+                this.scheduler.triggerJob(new JobKey(jobId));
+                res = true;
+            }
+        } catch (SchedulerException e) {
+            throw new AppException("can.not.trigger", Arrays.asList(jobId), e);
+        }
+        return res;
     }
 
     @Override

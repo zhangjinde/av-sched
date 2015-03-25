@@ -65,12 +65,14 @@ Obviously, this secret should remain, *ahem*, [secret](http://uncyclopedia.wikia
 ~~~
 POST host:8086/sched/api/job-def
 {
-  "id" : "av-server/timers",
-  "url" : "http://murphy:3000/echo",
+  "config" : {
+   "id" : "av-server/timers",
+   "url" : "http://murphy:3000/echo",
+   "timeout" : 60000
+  }
   "scheduling" : {
     "type" : "cron",
-    "value" : "0/30 0/1 * 1/1 * ? *",
-    "timeout" : 720000
+    "value" : "0/30 0/1 * 1/1 * ? *"
   }
 }
 ~~~
@@ -86,6 +88,8 @@ DELETE host:8086/sched/api/job-def
 
 ### Ack a job
 
+Acknowledge a "locked" job (one that has been triggered by the server.)
+
 ~~~
 POST host:8086/sched/api/job-action/ack
 {
@@ -93,7 +97,26 @@ POST host:8086/sched/api/job-action/ack
 }
 ~~~
 
-### List scheduled jobid
+### Trigger a job
+
+~~~
+POST host:8086/sched/api/job-action/trigger
+{
+  "id" : "av-server/timers"
+}
+~~~
+
+Response:
+
+~~~
+{
+  "triggered" : true
+}
+~~~
+
+A job that is locked (has been fired but not acknowledged yet will not be triggered.)
+
+### List scheduled jobs
 
 ~~~
 GET host:8086/sched/api/job
@@ -121,6 +144,8 @@ GET host:8086/sched/api/job
   }
 } ]
 ~~~
+
+##
 
 ## Functionnal Tests
 

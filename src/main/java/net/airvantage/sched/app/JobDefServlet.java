@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import net.airvantage.sched.app.exceptions.AppException;
 import net.airvantage.sched.app.mapper.JsonMapper;
 import net.airvantage.sched.model.JobDef;
 import net.airvantage.sched.model.JobId;

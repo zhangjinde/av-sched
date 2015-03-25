@@ -47,10 +47,9 @@ function renderDeleteButton(job) {
         className: "btn btn-danger btn-small",
         children: ["Delete"],
         onClick: function() {
-            var secret = window.prompt("What is the server secret ?", "");
-            if (secret) {
+            withSecret(function (secret) {
                 JobActionCreators.deleteJob(job.config.id, secret);
-            }
+            });
         }
     });
 }
@@ -58,17 +57,42 @@ function renderDeleteButton(job) {
 function renderLockButton(job) {
     if (job.lock && job.lock.locked) {
         return React.DOM.button({
-            className : "btn btn-small",
+            className : "btn btn-warning btn-small",
             children : ["Unlock"],
             onClick : function () {
-                var secret = window.prompt("What is the server secret ?", "");
-                if (secret) {
+                withSecret(function (secret) {
                     JobActionCreators.unlockJob(job.config.id, secret);
-                }
+                });
             }
         });
     }
     return null;
+}
+
+function renderTriggerButton(job) {
+    if (!isLocked(job)) {
+        return React.DOM.button({
+            className : "btn btn-primary btn-small",
+            children : ["Trigger"],
+            onClick : function () {
+                withSecret(function (secret) {
+                    JobActionCreators.triggerJob(job.config.id, secret);
+                });
+            }
+        });
+    }
+    return null;
+}
+
+function isLocked(job) {
+    return job.lock && job.lock.locked;
+}
+
+function withSecret(cb) {
+    var secret = window.prompt("What is the server secret ?", "");
+    if (secret) {
+        cb(secret);
+    }
 }
 
 function jobLine(job) {
@@ -82,7 +106,9 @@ function jobLine(job) {
         }), React.DOM.td({
             children : [renderLock(job)]
         }), React.DOM.td({
-            children: [renderDeleteButton(job), renderLockButton(job)]
+            children: [renderLockButton(job),
+                       renderTriggerButton(job),
+                       renderDeleteButton(job)]
         })]
     });
 }

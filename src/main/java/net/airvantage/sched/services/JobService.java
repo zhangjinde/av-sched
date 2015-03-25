@@ -1,6 +1,6 @@
 package net.airvantage.sched.services;
 
-import net.airvantage.sched.app.AppException;
+import net.airvantage.sched.app.exceptions.AppException;
 import net.airvantage.sched.model.JobDef;
 import net.airvantage.sched.model.JobId;
 
@@ -12,5 +12,7 @@ public interface JobService {
 
     public void ackJob(String jobId) throws AppException;
 
+    public boolean triggerJob(String jobId) throws AppException;
+    
     public void clean() throws AppException;
 }

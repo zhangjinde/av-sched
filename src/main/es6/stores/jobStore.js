@@ -33,10 +33,17 @@ var JobStore = {
 JobStore.dispatchTocken = AppDispatcher.register(function (action) {
 
     switch (action.type) {
-    case ActionTypes.RECEIVE_JOBS:
+
+    case ActionTypes.JOBS_RECEIVED:
         _jobs = action.jobs.reduce(function (accu, job) {
             return accu.set(job.config.id, job);
         }, Immutable.Map());
+        JobStore.emitChange();
+        break;
+
+    case ActionTypes.JOB_RECEIVED:
+        var job = action.job;
+        _jobs = _jobs.set(job.config.id, action.job);
         JobStore.emitChange();
         break;
 

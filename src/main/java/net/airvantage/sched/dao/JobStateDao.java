@@ -2,7 +2,7 @@ package net.airvantage.sched.dao;
 
 import java.util.List;
 
-import net.airvantage.sched.app.AppException;
+import net.airvantage.sched.app.exceptions.AppException;
 import net.airvantage.sched.model.JobDef;
 import net.airvantage.sched.model.JobState;
 

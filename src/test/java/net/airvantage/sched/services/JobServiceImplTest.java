@@ -3,7 +3,7 @@ package net.airvantage.sched.services;
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.Assert.fail;
 import net.airvantage.sched.TestUtils;
-import net.airvantage.sched.app.AppException;
+import net.airvantage.sched.app.exceptions.AppException;
 import net.airvantage.sched.dao.JobStateDao;
 import net.airvantage.sched.model.JobScheduling;
 import net.airvantage.sched.model.JobSchedulingType;

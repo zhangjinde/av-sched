@@ -4,7 +4,7 @@ import JobsPage from "./components/jobsPage";
 
 import SchedApi from "./api/schedApi";
 
-SchedApi.fetch();
+SchedApi.fetchAll();
 
 React.render(React.createElement(JobsPage), document.getElementsByTagName("body")[0]);
 

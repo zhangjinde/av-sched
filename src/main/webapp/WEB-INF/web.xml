@@ -66,7 +66,7 @@
 
 	<servlet-mapping>
 		<servlet-name>jobActionServlet</servlet-name>
-		<url-pattern>/api/job-action/ack</url-pattern>
+		<url-pattern>/api/job-action/*</url-pattern>
 	</servlet-mapping>
 
 	<servlet-mapping>

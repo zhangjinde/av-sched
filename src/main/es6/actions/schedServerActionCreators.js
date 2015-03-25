@@ -4,12 +4,20 @@ import {ActionTypes} from "../constants/appConstants";
 
 export default {
 
-    receiveJobs(jobs) {
+    jobReceived(job) {
         AppDispatcher.dispatch({
-            type : ActionTypes.RECEIVE_JOBS,
+            type : ActionTypes.JOB_RECEIVED,
+            job : job
+        });
+    },
+
+    jobsReceived(jobs) {
+        AppDispatcher.dispatch({
+            type : ActionTypes.JOBS_RECEIVED,
             jobs : jobs
         });
     },
+
 
     jobDeleted(jobId) {
         AppDispatcher.dispatch({
@@ -21,6 +29,13 @@ export default {
     jobUnlocked(jobId) {
         AppDispatcher.dispatch({
             type : ActionTypes.JOB_UNLOCKED,
+            jobId : jobId
+        });
+    },
+
+    jobTriggered(jobId) {
+        AppDispatcher.dispatch({
+            type : ActionTypes.JOB_TRIGGERED,
             jobId : jobId
         });
     }

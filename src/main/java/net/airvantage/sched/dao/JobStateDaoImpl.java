@@ -8,7 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import net.airvantage.sched.app.AppException;
+import net.airvantage.sched.app.exceptions.AppException;
+import net.airvantage.sched.app.exceptions.AppExceptions;
 import net.airvantage.sched.model.JobConfig;
 import net.airvantage.sched.model.JobDef;
 import net.airvantage.sched.model.JobLock;
@@ -46,7 +47,7 @@ public class JobStateDaoImpl implements JobStateDao {
 
         } catch (SQLException e) {
             LOG.error(String.format("Unable to store jobDef {}", jobDef), e);
-            throw AppException.serverError(e);
+            throw AppExceptions.serverError(e);
         }
 
     }
@@ -58,7 +59,7 @@ public class JobStateDaoImpl implements JobStateDao {
             this.jobLockDao.removeLock(jobId);
         } catch (SQLException e) {
             LOG.error(String.format("Unable to delete job state {}", jobId), e);
-            throw AppException.serverError(e);
+            throw AppExceptions.serverError(e);
         }
     }
 
@@ -68,17 +69,23 @@ public class JobStateDaoImpl implements JobStateDao {
         JobConfig config = null;
         JobLock lock = null;
         JobState state = null;
+        JobScheduling scheduling = null;
         try {
             config = this.jobConfigDao.findJobConfig(id);
             lock = this.jobLockDao.findJobLock(id);
+            scheduling = this.jobSchedulingDao.findJobScheduling(id);
         } catch (SQLException e) {
             LOG.error(String.format("Unable to find job state with id", id), e);
-            throw AppException.serverError(e);
+            throw AppExceptions.serverError(e);
+        } catch (SchedulerException e) {
+            LOG.error(String.format("Unable to find job state with id", id), e);
+            throw AppExceptions.serverError(e);
         }
         if (config != null) {
             state = new JobState();
             state.setConfig(config);
             state.setLock(lock);
+            state.setScheduling(scheduling);
         }
 
         return state;
@@ -95,7 +102,7 @@ public class JobStateDaoImpl implements JobStateDao {
             }
         } catch (SQLException e) {
             LOG.error(String.format("Unable to lock job state with id", id), e);
-            throw AppException.serverError(e);
+            throw AppExceptions.serverError(e);
         }
 
     }
@@ -104,12 +111,14 @@ public class JobStateDaoImpl implements JobStateDao {
     public void unlockJob(String id) throws AppException {
         try {
             JobState jobState = findJobState(id);
-            if (jobState != null) {
+            if (jobState == null) {
+                throw AppExceptions.jobNotFound(id);
+            } else {
                 this.jobLockDao.removeLock(id);
             }
         } catch (SQLException e) {
             LOG.error(String.format("Unable to lock job state with id", id), e);
-            throw AppException.serverError(e);
+            throw AppExceptions.serverError(e);
         }
     }
 
@@ -151,10 +160,10 @@ public class JobStateDaoImpl implements JobStateDao {
 
         } catch (SQLException e) {
             LOG.error(String.format("Unable to find job states"), e);
-            throw AppException.serverError(e);
+            throw AppExceptions.serverError(e);
         } catch (SchedulerException e) {
             LOG.error(String.format("Unable to find job states"), e);
-            throw AppException.serverError(e);
+            throw AppExceptions.serverError(e);
         }
 
         return states;

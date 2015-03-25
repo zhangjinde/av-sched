@@ -6,14 +6,22 @@ var _ = require("lodash");
 
 var sched = {
 
+    LOG: true,
+
+    log: function() {
+        if (sched.LOG) {
+            console.log.apply(console, arguments);
+        }
+    },
+
     startListener: function(state, id, secret) {
         return function() {
             return new Promise(function(resolve, reject) {
                 var app = express();
 
                 app.post("/test/" + id, function(req, res) {
-                    console.log("Received post requist on", req.path);
-                    //console.log("Received request from av-sched");
+                    sched.log("Received post request on", req.path);
+                    //sched.log("Received request from av-sched");
                     res.status(200).json({}).end();
                     var header = req.headers["x-sched-secret"];
                     assert.equal(header, secret, "Missing x-sched-secret header");
@@ -21,7 +29,7 @@ var sched = {
                 });
 
                 state.app = app;
-                console.log("Starting server listening on port", state.port);
+                sched.log("Starting server listening on port", state.port);
                 state.server = app.listen(state.port);
                 state.server.on("listening", function() {
                     resolve();
@@ -33,7 +41,7 @@ var sched = {
     stopListener: function(state) {
         return function() {
             return new Promise(function(resolve, reject) {
-                //            console.log("STOP Closing server", state.server);
+                //            sched.log("STOP Closing server", state.server);
                 state.server.close();
                 resolve();
             });
@@ -42,7 +50,7 @@ var sched = {
 
     scheduleJob: function(state, id, interval, secret) {
         return function() {
-            console.log("Scheduling job on port", state.port, "with id", id);
+            sched.log("Scheduling job on port", state.port, "with id", id);
             return rp({
                 uri: "http://localhost:8086/sched/api/job-def",
                 method: "POST",
@@ -65,18 +73,18 @@ var sched = {
 
     },
 
-    unscheduleJob : function (state, id, secret) {
+    unscheduleJob: function(state, id, secret) {
 
-        return function () {
-            console.log("Unscheduling job on port", state.port);
+        return function() {
+            sched.log("Unscheduling job on port", state.port);
             return rp({
-                uri : "http://localhost:8086/sched/api/job-def",
-                method : "DELETE",
-                headers : {
-                    "X-sched-secret" : secret
+                uri: "http://localhost:8086/sched/api/job-def",
+                method: "DELETE",
+                headers: {
+                    "X-sched-secret": secret
                 },
-                body : JSON.stringify({
-                    id : id
+                body: JSON.stringify({
+                    id: id
                 })
             });
         };
@@ -85,7 +93,7 @@ var sched = {
 
     waitFor: function(seconds) {
         return function() {
-            //console.log("Waiting for " + seconds + " seconds");
+            //sched.log("Waiting for " + seconds + " seconds");
             return new Promise(function(resolve, reject) {
                 setTimeout(function() {
                     resolve();
@@ -95,7 +103,7 @@ var sched = {
     },
     checkCalls: function(state, count, message) {
         return function() {
-            //console.log("Checking state");
+            //sched.log("Checking state");
             return new Promise(function(resolve, reject) {
                 assert.equal(state.count, count, "Unexpected number of server call (try " + message + ")");
                 resolve();
@@ -105,7 +113,7 @@ var sched = {
 
     ackJob: function(id, secret) {
         return function() {
-            //console.log("Acking job");
+            //sched.log("Acking job");
             return rp({
                 uri: "http://localhost:8086/sched/api/job-action/ack",
                 method: "POST",
@@ -113,11 +121,44 @@ var sched = {
                     "x-sched-secret": secret,
                     "content-type": "application/json"
                 },
-                body: JSON.stringify({
+                json: true,
+                body: {
                     id: id
-                })
+                }
             });
         };
+    },
+
+    triggerJob: function(id, secret, expected) {
+        return function() {
+            return rp({
+                uri: "http://localhost:8086/sched/api/job-action/trigger",
+                method: "POST",
+                headers: {
+                    "x-sched-secret": secret,
+                    "content-type": "application/json"
+                },
+                json: true,
+                body: {
+                    id: id
+                }
+            }).then(function(result) {
+                if (expected) {
+                    assert.deepEqual(result, expected, "Unexpected trigger response");
+                }
+            });
+        };
+    },
+
+    getJob : function (jobId) {
+        return rp({
+            uri: "http://localhost:8086/sched/api/job?jobId="+jobId,
+            method: "GET",
+            headers: {
+                "content-type": "application/json"
+            },
+            json: true
+        });
     },
 
     getJobs: function() {

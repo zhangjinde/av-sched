@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.airvantage.sched.app.AppException;
+import net.airvantage.sched.app.exceptions.AppException;
 import net.airvantage.sched.model.JobDef;
 import net.airvantage.sched.model.JobLock;
 import net.airvantage.sched.model.JobState;

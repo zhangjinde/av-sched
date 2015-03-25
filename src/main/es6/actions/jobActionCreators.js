@@ -18,6 +18,14 @@ export default {
             jobId : jobId
         });
         SchedApi.unlock(jobId, secret);
+    },
+
+    triggerJob(jobId, secret) {
+        AppDispatcher.dispatch({
+            type : ActionTypes.TRIGGER_JOB,
+            jobId : jobId
+        });
+        SchedApi.trigger(jobId, secret);
     }
 
 };
