@@ -34,10 +34,10 @@ SECURED_STACK_PARAMS_NAMES=( DBPwd AvSchedSecret )
 
 
 # ----------------------------------------------------------------------------------------
-# 
+#
 # Initialize the variables used by the script.
 # At least the variables VERSION NETWORK_STACK STACK_NAME need to be set.
-# 
+#
 # ----------------------------------------------------------------------------------------
 
 function init_variables {
@@ -52,11 +52,11 @@ function init_variables {
 }
 
 # ----------------------------------------------------------------------------------------
-# 
+#
 # Build all required artifacts for your application and upload them on S3.
-# 
+#
 # This function is only called if the command line parameter '-build' is used.
-# 
+#
 # ----------------------------------------------------------------------------------------
 
 function build {
@@ -64,8 +64,9 @@ function build {
     print "Build Artifact" 6
 
     initial_dir=`pwd`
-    
+
     cd $CURRENT_DIR/..
+    npm install
     mvn clean package -q
 
     # Back to the initial directory
@@ -80,12 +81,12 @@ function build {
 }
 
 # ----------------------------------------------------------------------------------------
-# 
+#
 # Function called just before to deploy a version of your application.
 # This function is used to perform some checks ckecks (artifacts exists on S3, ...).
-# 
+#
 # This function is only called if the command line parameter '-deploy' is used.
-# 
+#
 # ----------------------------------------------------------------------------------------
 
 function check_before_deploy {
