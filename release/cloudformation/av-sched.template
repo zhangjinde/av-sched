@@ -86,7 +86,7 @@
                     { "Ref": "PrivateSubnetC" }
                 ],
                 "HealthCheck": {
-                    "Target": "HTTP:8086/",
+                    "Target": "HTTP:8086/sched/check",
                     "Timeout": 2,
                     "Interval": 5,
                     "UnhealthyThreshold": 6,
