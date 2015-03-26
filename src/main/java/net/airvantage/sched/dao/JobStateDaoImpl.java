@@ -1,6 +1,5 @@
 package net.airvantage.sched.dao;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -16,8 +15,6 @@ import net.airvantage.sched.model.JobLock;
 import net.airvantage.sched.model.JobScheduling;
 import net.airvantage.sched.model.JobState;
 
-import org.apache.commons.dbutils.QueryRunner;
-import org.apache.commons.dbutils.ResultSetHandler;
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

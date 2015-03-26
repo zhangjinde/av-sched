@@ -1,5 +1,7 @@
 package net.airvantage.sched.quartz;
 
+import static com.google.common.truth.Truth.assertThat;
+
 import java.util.List;
 
 import net.airvantage.sched.TestUtils;
@@ -11,18 +13,14 @@ import org.apache.http.ProtocolVersion;
 import org.apache.http.StatusLine;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.message.BasicHttpResponse;
 import org.apache.http.message.BasicStatusLine;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-
-import static com.google.common.truth.Truth.assertThat;
 
 public class PostHttpJobTest {
 

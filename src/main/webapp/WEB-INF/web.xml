@@ -14,9 +14,6 @@
 		</init-param>
 	</servlet>
 
-	<welcome-file-list>
-		<welcome-file>public/index.html</welcome-file>
-	</welcome-file-list>
 	<!-- Definition of a new job -->
 	<servlet>
 		<servlet-name>jobDefServlet</servlet-name>
@@ -74,9 +71,15 @@
 		<url-pattern>/api/job</url-pattern>
 	</servlet-mapping>
 
+<!-- 
 	<servlet-mapping>
 		<servlet-name>default</servlet-name>
-		<url-pattern>/*</url-pattern>
+		<url-pattern>/</url-pattern>
 	</servlet-mapping>
+ -->
+
+    <welcome-file-list>
+        <welcome-file>public/index.html</welcome-file>
+    </welcome-file-list>
 
 </web-app>

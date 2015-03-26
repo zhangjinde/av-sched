@@ -8,7 +8,6 @@ import java.util.Set;
 import net.airvantage.sched.model.JobScheduling;
 import net.airvantage.sched.model.JobSchedulingType;
 
-import org.quartz.JobDetail;
 import org.quartz.JobKey;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;

@@ -6,6 +6,8 @@
     "sub" : true,
     "esnext" : true,
     "globals" : {
-       "React" : true
+       "describe" : true,
+       "it" : true,
+       "require" : true
     }
 }

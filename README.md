@@ -2,7 +2,8 @@
 
 ## Work In Progress
 
-- There is no UI
+- The UI is not built in the JAR
+- The UI is minimalistic
 
 ## Configuration
 
@@ -48,6 +49,10 @@ Database credentials. You should create the db and user yourself.
 - `mvn package`
 - `export AVSCHED_CONF_DIR=/home/....`
 - `java -jar target/av-sched-x.y.z-exec.jar`
+
+## UI
+
+Go to `http://localhost:8086/sched/`
 
 ## API
 
