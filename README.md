@@ -97,6 +97,17 @@ DELETE host:8086/sched/api/job-def
 }
 ~~~
 
+Return value :
+
+~~~
+{
+  "id" : "av-server/timers",
+  "deleted" : true
+}
+~~~
+
+Deleting a job that do not exist simply returns "false" in the "deleted" field.
+
 ### Ack a job
 
 Acknowledge a "locked" job (one that has been triggered by the server.)

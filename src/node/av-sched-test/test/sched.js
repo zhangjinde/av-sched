@@ -73,7 +73,7 @@ var sched = {
 
     },
 
-    unscheduleJob: function(state, id, secret) {
+    unscheduleJob: function(state, id, secret, expectedResult) {
 
         return function() {
             sched.log("Unscheduling job on port", state.port);
@@ -83,9 +83,15 @@ var sched = {
                 headers: {
                     "X-sched-secret": secret
                 },
-                body: JSON.stringify({
+                json : true,
+                body: {
                     id: id
-                })
+                }
+            }).then(function (result) {
+                if (expectedResult) {
+                    assert.deepEqual(expectedResult, result, "Unexpected unschedule result");
+                }
+                return result;
             });
         };
 

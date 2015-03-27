@@ -74,9 +74,9 @@ public class JobDefServlet extends HttpServlet {
         
         try {
             JobId jobId = JsonMapper.jobId(req.getInputStream());
-            jobService.unscheduleJob(jobId);
-            // TODO(pht) not sure what to return
+            boolean deleted = jobService.unscheduleJob(jobId);
             res.put("id", jobId.getId());
+            res.put("deleted", deleted);
         } catch (AppException e) {
             LOG.debug("Exception while scheduling job", e);
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);

@@ -8,7 +8,7 @@ public interface JobService {
 
     public void scheduleJob(JobDef jobDef) throws AppException;
 
-    public void unscheduleJob(JobId jobId) throws AppException;
+    public boolean unscheduleJob(JobId jobId) throws AppException;
 
     public void ackJob(String jobId) throws AppException;
 

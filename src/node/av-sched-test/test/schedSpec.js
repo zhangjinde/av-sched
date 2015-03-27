@@ -1,7 +1,7 @@
 var sched = require("./sched.js");
 var assert = require("chai").assert;
 
-// sched.LOG = false;
+sched.LOG = false;
 
 describe("av-sched", function() {
 
@@ -100,10 +100,20 @@ describe("av-sched", function() {
         return sched.startListener(state, jobId, secret)()
             .then(sched.checkCalls(state, 0, "0"))
             .then(sched.scheduleJob(state, jobId, 5, secret))
-            .then(sched.unscheduleJob(state, jobId, secret))
+            .then(sched.unscheduleJob(state, jobId, secret, {
+                id : jobId,
+                deleted : true
+            }))
             .then(sched.waitFor(5))
             .then(sched.checkCalls(state, 0, "1"))
             .then(sched.stopListener(state));
+    });
+
+    it("silently removes non existing job", function () {
+        return sched.unscheduleJob(state, jobId, secret, {
+            id : jobId,
+            deleted : false
+        })();
     });
 
     it("can trigger job execution", function () {
