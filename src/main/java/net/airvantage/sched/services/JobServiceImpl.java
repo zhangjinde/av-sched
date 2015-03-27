@@ -47,9 +47,10 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public void unscheduleJob(JobId jobId) throws AppException {
-        unscheduleQuartzJob(jobId);
+    public boolean unscheduleJob(JobId jobId) throws AppException {
+        boolean res = unscheduleQuartzJob(jobId);
         deleteJobDef(jobId);
+        return res;
     }
 
     @Override
@@ -110,16 +111,24 @@ public class JobServiceImpl implements JobService {
         }
     }
 
-    private void unscheduleQuartzJob(JobId jobId) throws AppException {
+    /**
+     * Try unscheduling the job.
+     * 
+     * @return true if the job existed, and was unscheduled.
+     */
+    private boolean unscheduleQuartzJob(JobId jobId) throws AppException {
+        boolean unscheduled = false;
         try {
             JobKey key = new JobKey(jobId.getId());
             if (this.scheduler.checkExists(key)) {
                 this.scheduler.deleteJob(key);
+                unscheduled = true;
             }
         } catch (SchedulerException e) {
             LOG.error("Unable to unschedule job with id : " + jobId.getId(), e);
             throw new AppException("internal.error", new ArrayList<String>(), e);
         }
+        return unscheduled;
     }
 
     protected JobDetail jobDefToJobDetail(JobDef jobDef) {
