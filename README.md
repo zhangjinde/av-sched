@@ -80,7 +80,7 @@ POST host:8086/sched/api/job-def
    "id" : "av-server/timers",
    "url" : "http://murphy:3000/echo",
    "timeout" : 60000
-  }
+  },
   "scheduling" : {
     "type" : "cron",
     "value" : "0/30 0/1 * 1/1 * ? *"
