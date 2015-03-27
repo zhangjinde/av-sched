@@ -106,7 +106,7 @@ Return value :
 }
 ~~~
 
-Deleting a job that do not exist simply returns "true" in the "deleted" field.
+Deleting a job that do not exist simply returns "false" in the "deleted" field.
 
 ### Ack a job
 
