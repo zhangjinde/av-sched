@@ -1,6 +1,6 @@
 #!/bin/bash
 
-CURRENT_DIR=`dirname $(realpath $0)`
+SCRIPT_DIR=`dirname $(realpath $0)`
 
 # Path and URL of av-repo
 AV_REPO_PATH=s3://av-repo
@@ -8,9 +8,6 @@ AV_REPO_URL=https://s3-eu-west-1.amazonaws.com/av-repo
 
 # Name of the repo where to upload the resources (artifact, template, ...)
 REPO_NAME=av-sched-stores
-
-# Name of the cloudformation template
-TEMPLATE_NAME=av-sched-stores.template
 
 # Default values for EnvName
 declare -A DEFAULT_PARAMS
@@ -35,7 +32,7 @@ SECURED_STACK_PARAMS_NAMES=( DBPwd )
 # ----------------------------------------------------------------------------------------
 # 
 # Initialize the variables used by the script.
-# At least the variables VERSION NETWORK_STACK STACK_NAME need to be set.
+# At least the variables ENV_NAME VERSION NETWORK_STACK STACK_NAME need to be set.
 # 
 # ----------------------------------------------------------------------------------------
 
@@ -44,6 +41,7 @@ function init_variables {
     NETWORK_STACK=$ENV_NAME-net
     STACK_NAME=$ENV_NAME-av-sched-stores
     
+    # Get the parameter 'Version'. If the parameter is not defined then a value will be generated.
     VERSION=$(get_parameter Version $ENV_NAME-`date -u +%Y%m%d%H%M%S`)
 }
 
@@ -59,21 +57,7 @@ function build {
     print "Upload resources to S3" 6
 
     print "Uploading cloudformation" 2
-    aws s3 cp $CURRENT_DIR/cloudformation/$TEMPLATE_NAME $AV_REPO_PATH/deployments/$REPO_NAME/$VERSION/cloudformation/
-}
-
-# ----------------------------------------------------------------------------------------
-# 
-# Function called just before to deploy a version of your application.
-# This function is used to perform some checks ckecks (artifacts exists on S3, ...).
-# 
-# This function is only called if the command line parameter '-deploy' is used.
-# 
-# ----------------------------------------------------------------------------------------
-
-function check_before_deploy {
-
-    print "Check resources" 6
+    upload_template $SCRIPT_DIR/cloudformation/av-sched-stores.template
 }
 
 
@@ -83,5 +67,5 @@ function check_before_deploy {
 ##
 ## ==================================================================================
 
-aws s3 cp $AV_REPO_PATH/tools/deploy-tools.sh $CURRENT_DIR
-source $CURRENT_DIR/deploy-tools.sh
+aws s3 cp $AV_REPO_PATH/tools/deploy-tools.sh $SCRIPT_DIR
+source $SCRIPT_DIR/deploy-tools.sh

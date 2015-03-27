@@ -1,6 +1,6 @@
 #!/bin/bash
 
-CURRENT_DIR=`dirname $(realpath $0)`
+SCRIPT_DIR=`dirname $(realpath $0)`
 
 # Path and URL of av-repo
 AV_REPO_PATH=s3://av-repo
@@ -8,9 +8,6 @@ AV_REPO_URL=https://s3-eu-west-1.amazonaws.com/av-repo
 
 # Name of the repo where to upload the resources (artifact, template, ...)
 REPO_NAME=av-sched
-
-# Name of the cloudformation template
-TEMPLATE_NAME=av-sched.template
 
 # Default values for EnvName, BaseAMI
 declare -A DEFAULT_PARAMS
@@ -36,7 +33,7 @@ SECURED_STACK_PARAMS_NAMES=( DBPwd AvSchedSecret )
 # ----------------------------------------------------------------------------------------
 #
 # Initialize the variables used by the script.
-# At least the variables VERSION NETWORK_STACK STACK_NAME need to be set.
+# At least the variables ENV_NAME VERSION NETWORK_STACK STACK_NAME need to be set.
 #
 # ----------------------------------------------------------------------------------------
 
@@ -65,7 +62,7 @@ function build {
 
     initial_dir=`pwd`
 
-    cd $CURRENT_DIR/..
+    cd $SCRIPT_DIR/..
     npm install
     mvn clean package -q
 
@@ -76,30 +73,11 @@ function build {
 
     print "Upload resources to S3" 6
 
-    aws s3 cp $CURRENT_DIR/cloudformation/$TEMPLATE_NAME $AV_REPO_PATH/deployments/$REPO_NAME/$VERSION/cloudformation/
-    aws s3 cp $CURRENT_DIR/../target/av-sched-*-exec.jar $AV_REPO_PATH/apps/$REPO_NAME/$VERSION/artifacts/av-sched.jar
-}
+    print "Uploading cloudformation" 2
+    upload_template $SCRIPT_DIR/cloudformation/av-sched.template
 
-# ----------------------------------------------------------------------------------------
-#
-# Function called just before to deploy a version of your application.
-# This function is used to perform some checks ckecks (artifacts exists on S3, ...).
-#
-# This function is only called if the command line parameter '-deploy' is used.
-#
-# ----------------------------------------------------------------------------------------
-
-function check_before_deploy {
-
-    print "Check resources" 6
-
-    # Check if the artifact exists for the specified version
-    local artifact_exists=`aws s3 ls $AV_REPO_PATH/apps/$REPO_NAME/$VERSION/artifacts/av-sched.jar`
-    if [ -z "$artifact_exists" ]
-    then
-        echo "No artifact found for the version: $VERSION"
-        exit 1
-    fi
+    print "Uploading artifact" 2
+    upload_on_repo $SCRIPT_DIR/../target/av-sched-*-exec.jar av-sched.jar
 }
 
 
@@ -109,5 +87,5 @@ function check_before_deploy {
 ##
 ## ==================================================================================
 
-aws s3 cp $AV_REPO_PATH/tools/deploy-tools.sh $CURRENT_DIR
-source $CURRENT_DIR/deploy-tools.sh
+aws s3 cp $AV_REPO_PATH/tools/deploy-tools.sh $SCRIPT_DIR
+source $SCRIPT_DIR/deploy-tools.sh
