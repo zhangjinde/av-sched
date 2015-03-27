@@ -1,6 +1,6 @@
 package net.airvantage.sched.quartz;
 
-import net.airvantage.sched.app.AppException;
+import net.airvantage.sched.app.exceptions.AppException;
 import net.airvantage.sched.dao.JobStateDao;
 import net.airvantage.sched.model.JobLock;
 import net.airvantage.sched.model.JobState;

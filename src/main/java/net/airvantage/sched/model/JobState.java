@@ -4,9 +4,18 @@ public class JobState {
 
     private JobConfig config;
     private JobLock lock;
+    private JobScheduling scheduling;
 
     public JobConfig getConfig() {
         return config;
+    }
+
+    public JobScheduling getScheduling() {
+        return scheduling;
+    }
+
+    public void setScheduling(JobScheduling scheduling) {
+        this.scheduling = scheduling;
     }
 
     public void setConfig(JobConfig config) {

@@ -1,7 +1,7 @@
 package net.airvantage.sched.model;
 
 
-public class JobSchedulingDef {
+public class JobScheduling {
     
     private JobSchedulingType type;
     private String value;

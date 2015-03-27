@@ -3,9 +3,9 @@ package net.airvantage.sched.services;
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.Assert.fail;
 import net.airvantage.sched.TestUtils;
-import net.airvantage.sched.app.AppException;
+import net.airvantage.sched.app.exceptions.AppException;
 import net.airvantage.sched.dao.JobStateDao;
-import net.airvantage.sched.model.JobSchedulingDef;
+import net.airvantage.sched.model.JobScheduling;
 import net.airvantage.sched.model.JobSchedulingType;
 
 import org.junit.Test;
@@ -20,14 +20,14 @@ public class JobServiceImplTest {
 
     @Test
     public void testCanGetSchedulingFromCronJobDef() throws Exception {
-        JobSchedulingDef schedDef = TestUtils.cronJobSchedulingDef();
+        JobScheduling schedDef = TestUtils.cronJobSchedulingDef();
         ScheduleBuilder<? extends Trigger> builder = JobServiceImpl.scheduleBuilder(schedDef);
         assertThat(builder).isInstanceOf(CronScheduleBuilder.class);
     }
 
     @Test
     public void testThrowsWhenCronExpressionIsInvalid() throws Exception {
-        JobSchedulingDef schedDef = new JobSchedulingDef();
+        JobScheduling schedDef = new JobScheduling();
         schedDef.setType(JobSchedulingType.CRON);
         schedDef.setValue("foo");
         try {

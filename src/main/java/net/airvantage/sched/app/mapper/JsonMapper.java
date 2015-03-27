@@ -3,7 +3,7 @@ package net.airvantage.sched.app.mapper;
 import java.io.IOException;
 import java.io.InputStream;
 
-import net.airvantage.sched.app.AppException;
+import net.airvantage.sched.app.exceptions.AppException;
 import net.airvantage.sched.model.JobDef;
 import net.airvantage.sched.model.JobId;
 

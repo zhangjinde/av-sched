@@ -1,4 +1,4 @@
-package net.airvantage.sched.app;
+package net.airvantage.sched.app.exceptions;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -54,10 +54,6 @@ public class AppException extends Exception {
         map.put("error", error);
         map.put("params", params);
         return map;
-    }
-
-    public static AppException serverError(Throwable cause) {
-        return new AppException("unexpectedError", cause);
     }
 
 }

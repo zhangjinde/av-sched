@@ -3,7 +3,7 @@ package net.airvantage.sched.model;
 public class JobDef {
 
     private JobConfig config;
-    private JobSchedulingDef scheduling;
+    private JobScheduling scheduling;
 
     public JobConfig getConfig() {
         return config;
@@ -13,24 +13,12 @@ public class JobDef {
         this.config = config;
     }
 
-    public JobSchedulingDef getScheduling() {
+    public JobScheduling getScheduling() {
         return scheduling;
     }
 
-    public void setScheduling(JobSchedulingDef scheduling) {
+    public void setScheduling(JobScheduling scheduling) {
         this.scheduling = scheduling;
     }
-
-//    
-//    @Override
-//    public String toString() {
-//        StringBuilder builder = new StringBuilder();
-//        builder.append("{ id :" + id);
-//        builder.append(", url :" + url);
-//        builder.append(", timeout :" + timeout);
-//        builder.append(", sched :" + this.scheduling.toString());
-//        builder.append(" }");
-//        return builder.toString();
-//    }
     
 }

@@ -9,8 +9,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import net.airvantage.sched.app.exceptions.AppException;
 import net.airvantage.sched.app.mapper.JsonMapper;
 import net.airvantage.sched.model.JobDef;
+import net.airvantage.sched.model.JobId;
 import net.airvantage.sched.services.JobService;
 
 import org.quartz.SchedulerException;
@@ -55,7 +57,7 @@ public class JobDefServlet extends HttpServlet {
         try {
             JobDef jobDef = JsonMapper.jobDef(req.getInputStream());
             jobService.scheduleJob(jobDef);
-            // TODO(pht) or something better ?
+            // TODO(pht) not sure what to return
             res.put("id", jobDef.getConfig().getId());
         } catch (AppException e) {
             LOG.debug("Exception while scheduling job", e);
@@ -66,4 +68,23 @@ public class JobDefServlet extends HttpServlet {
         resp.getWriter().println(JACKSON.writeValueAsString(res));
     }
 
+    @Override
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    Map<String, Object> res = new HashMap<String, Object>();
+        
+        try {
+            JobId jobId = JsonMapper.jobId(req.getInputStream());
+            jobService.unscheduleJob(jobId);
+            // TODO(pht) not sure what to return
+            res.put("id", jobId.getId());
+        } catch (AppException e) {
+            LOG.debug("Exception while scheduling job", e);
+            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            res = e.asMap();
+        }
+        resp.setContentType("application/json");
+        resp.getWriter().println(JACKSON.writeValueAsString(res));
+    
+    }
+    
 }

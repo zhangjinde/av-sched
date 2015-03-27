@@ -4,3 +4,5 @@ target
 conf/deploy-sched-local.properties
 node_modules
 release/deploy-tools.sh
+src/main/webapp/public/bower
+src/main/webapp/public/dist

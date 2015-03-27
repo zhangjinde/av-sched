@@ -2,7 +2,8 @@
 
 ## Work In Progress
 
-- There is no UI
+- Some API validation missing
+- Jobs are not "killed" if calling them fails too often
 
 ## Configuration
 
@@ -28,17 +29,36 @@ Database credentials. You should create the db and user yourself.
 
 ## Usage
 
-### From eclipse
+### Build UI
+
+- `npm install -g gulp`
+- `npm install -g bower`
+- `bower install`
+- `gulp build` (or `gulp dev` if you want js files to be recompiled on the fly)
+
+### Run server
+
+Database bootstrap and migrations are automatically run at application startup.
+
+#### From eclipse
 
 - `mvn eclipse:eclipse`
 - setup AVSCHED_CONF_DIR variable in build conf
 - Run `SchedMain`
 
-### From jar
+#### From jar
 
 - `mvn package`
 - `export AVSCHED_CONF_DIR=/home/....`
 - `java -jar target/av-sched-x.y.z-exec.jar`
+
+### Options
+
+- `--clear` : clear data from MySql tables and Quartz scheduler (usefull for tests.)
+
+## UI
+
+Open `http://localhost:8086/sched/`.
 
 ## API
 
@@ -54,26 +74,119 @@ Obviously, this secret should remain, *ahem*, [secret](http://uncyclopedia.wikia
 ### Schedule a job
 
 ~~~
-POST host:8086/sched/api/job
+POST host:8086/sched/api/job-def
 {
-  "id" : "av-server/timers",
-  "url" : "http://murphy:3000/echo",
+  "config" : {
+   "id" : "av-server/timers",
+   "url" : "http://murphy:3000/echo",
+   "timeout" : 60000
+  }
   "scheduling" : {
     "type" : "cron",
-    "value" : "0/30 0/1 * 1/1 * ? *",
-    "timeout" : 720000
+    "value" : "0/30 0/1 * 1/1 * ? *"
   }
+}
+~~~
+
+### Unschedule a job
+
+~~~
+DELETE host:8086/sched/api/job-def
+{
+  "id" : "av-server/timers"
 }
 ~~~
 
 ### Ack a job
 
+Acknowledge a "locked" job (one that has been triggered by the server.)
+
 ~~~
-POST host:8086/sched/api/job
+POST host:8086/sched/api/job-action/ack
 {
   "id" : "av-server/timers"
 }
 ~~~
+
+### Trigger a job
+
+~~~
+POST host:8086/sched/api/job-action/trigger
+{
+  "id" : "av-server/timers"
+}
+~~~
+
+Response:
+
+~~~
+{
+  "triggered" : true
+}
+~~~
+
+A job that is locked (has been fired but not acknowledged yet will not be triggered.)
+
+### List scheduled jobs
+
+~~~
+GET host:8086/sched/api/job
+[ {
+  "config" : {
+    "id" : "test-job-1426783470991",
+    "url" : "http://localhost:3030/test/test-job-1426783470991",
+    "timeout" : 60000
+  },
+  "scheduling" : {
+    "type" : "cron",
+    "value" : ".."
+  },
+  "lock" : {
+    "locked" : true,
+    "expiresAt" : 1426783532000,
+    "expired" : true
+  }
+}, {
+  "config" : {
+    "id" : "test-job-1426783460784",
+    "url" : "http://localhost:3020/test/test-job-1426783460784",
+    "timeout" : 60000
+   },
+  "scheduling" : {
+    "type" : "cron",
+    "value" : ".."
+  },
+  "lock" : {
+    "locked" : true,
+    "expiresAt" : 1426783530000,
+    "expired" : true
+  }
+} ]
+~~~
+
+### Get a single job
+
+~~~
+GET host:8086/sched/api/job?jobId=test-job-1426783470991
+[ {
+  "config" : {
+    "id" : "test-job-1426783470991",
+    "url" : "http://localhost:3030/test/test-job-1426783470991",
+    "timeout" : 60000
+  },
+  "scheduling" : {
+    "type" : "cron",
+    "value" : ".."
+  },
+  "lock" : {
+    "locked" : true,
+    "expiresAt" : 1426783532000,
+    "expired" : true
+  }
+} ]
+~~~
+
+
 
 ## Functionnal Tests
 

@@ -10,6 +10,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,7 +23,7 @@ public class PostHttpJob implements Job {
     private String schedSecret;
 
     
-    public PostHttpJob() {
+    public PostHttpJob() throws SchedulerException {
         this(ServiceLocator.getInstance().getHttpClient(),
                 ServiceLocator.getInstance().getJobStateDao(),
                 ServiceLocator.getInstance().getSchedSecret());
@@ -42,7 +43,9 @@ public class PostHttpJob implements Job {
     protected void doJob(String jobId) throws JobExecutionException {
         try {
             JobState jobState = this.jobStateDao.findJobState(jobId);
-            HttpPost request = new HttpPost(jobState.getConfig().getUrl());
+            String url = jobState.getConfig().getUrl();
+            LOG.debug("Will post to url", url);
+            HttpPost request = new HttpPost(url);
             request.setHeader("X-Sched-secret", schedSecret);
             HttpResponse response = this.http.execute(request);
             if (response.getStatusLine().getStatusCode() == 200) {
@@ -52,9 +55,12 @@ public class PostHttpJob implements Job {
                 LOG.error("TODO(pht) What do we want, again ?");
             }
         } catch (Exception e) {
+            // The host might just be closed, that will happen a lot in tests...
             LOG.error("Unable to post to url", e);
             // TODO(pht) notify "logging" logical system
         }
     }
+    
+    
     
 }

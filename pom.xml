@@ -195,6 +195,28 @@
 					</execution>
 				</executions>
 			</plugin>
+
+                            <plugin>
+                                <groupId>org.codehaus.mojo</groupId>
+                                <artifactId>exec-maven-plugin</artifactId>
+                                <version>1.4.0</version>
+                                <executions>
+                                    <execution>
+                                        <phase>generate-sources</phase>
+                                        <goals>
+                                            <goal>exec</goal>
+                                        </goals>
+                                    </execution>
+                                </executions>
+                                <configuration>
+                                    <executable>./node_modules/.bin/gulp</executable>
+                                    <arguments>
+                                        <argument>clean</argument>
+                                        <argument>build</argument>
+                                    </arguments>
+                                </configuration>
+                            </plugin>
+
 		</plugins>
 	</build>
 </project>

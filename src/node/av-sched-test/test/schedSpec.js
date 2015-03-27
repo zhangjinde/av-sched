@@ -1,123 +1,155 @@
-var Promise = require("bluebird");
-var express = require("express");
-var rp = require("request-promise");
+var sched = require("./sched.js");
 var assert = require("chai").assert;
 
-function startListener(state, id, secret) {
-    return function () {
-    return new Promise(function (resolve, reject) {
-        var app = express();
+// sched.LOG = false;
 
-        app.post("/test/" + id, function (req, res) {
-            //console.log("Received request from av-sched");
-            res.status(200).json({});
-            var header = req.headers["x-sched-secret"];
-            assert.equal(header, secret, "Missing x-sched-secret header");
-            state.count = state.count + 1;
-        });
+describe("av-sched", function() {
 
-        state.server = app.listen(3000, function () {
-            resolve();
-        });
+    var jobId = null;
+    var secret = "secret";
+    var state = null;
+    var port = 0;
+
+    beforeEach(function() {
+        port = port + 10;
+        state = {
+            count: 0,
+            port: 3000 + port
+        };
+        jobId = "test-job-" + new Date().getTime();
     });
-    };
-}
 
-function scheduleJob(id, interval, secret) {
-    return function () {
-        //console.log("Scheduling job");
-        return rp({
-            uri : "http://localhost:8086/sched/api/job",
-            method : "POST",
-            headers : {
-                "X-sched-secret" : secret
-            },
-            body : JSON.stringify({
-                config : {
-                    id : id,
-                    url : "http://localhost:3000/test/" + id,
-                    timeout : 60000
-                },
+    it("can schedule cron jobs until ack arrives", function() {
+
+        sched.log("Testing job ack...");
+
+        return sched.startListener(state, jobId, secret)()
+            .then(sched.checkCalls(state, 0, "0"))
+            .then(sched.scheduleJob(state, jobId, 2, secret))
+            .then(sched.waitFor(4))
+            .then(sched.checkCalls(state, 1, "1"))
+            .then(sched.waitFor(2))
+            .then(sched.checkCalls(state, 1, "2"))
+            .then(sched.waitFor(2))
+            .then(sched.checkCalls(state, 1, "3"))
+            .then(sched.ackJob(jobId, secret))
+            .then(sched.waitFor(2))
+            .then(sched.checkCalls(state, 2, "4"))
+            .then(sched.stopListener(state));
+
+    });
+
+    it("can retrieve a single job", function () {
+        return sched.scheduleJob(state, "test-query-single", 5, secret)()
+            .then(function () {
+                return sched.getJob("test-query-single");
+            })
+            .then(function (jobs) {
+                assert.deepEqual([{
+                    config : {
+                        id : "test-query-single",
+                        url : "http://localhost:" + state.port + "/test/test-query-single",
+                        timeout : 60000
+                    },
+                    scheduling : {
+                        type : "cron",
+                        value : "0/5 0/1 * 1/1 * ? *"
+                    },
+                    lock : {
+                        expired : false,
+                        locked : false,
+                        expiresAt : null
+                    }
+                }], jobs);
+            });
+    });
+
+    it("can list jobs", function() {
+
+        sched.log("Testing list of jobs...");
+
+        return sched.startListener(state, jobId, secret)()
+            .then(sched.checkHasNoJobState(jobId))
+            .then(sched.scheduleJob(state, jobId, 2, secret))
+            .then(sched.checkHasJobState(jobId, {
                 scheduling : {
                     type : "cron",
-                    value : "0/"+ interval + " 0/1 * 1/1 * ? *"
+                    value : "0/2 0/1 * 1/1 * ? *"
+                },
+                lock : {
+                    locked: false
                 }
-            })
-        });
-    };
-
-}
-
-function waitFor(seconds) {
-    return function () {
-        //console.log("Waiting for " + seconds + " seconds");
-        return new Promise(function (resolve, reject) {
-            setTimeout(function () {
-                resolve();
-            }, seconds * 1000);
-        });
-    };
-}
-
-function checkCalls(state, count) {
-    return function () {
-        //console.log("Checking state");
-        return new Promise(function (resolve, reject) {
-            assert.equal(state.count, count, "Unexpected number of server call");
-            resolve();
-        });
-    };
-}
-
-function ackJob(id, secret) {
-    return function () {
-        //console.log("Acking job");
-        return rp({
-            uri : "http://localhost:8086/sched/api/job/ack",
-            method : "POST",
-            headers : {
-                "x-sched-secret" : secret,
-                "content-type" : "application/json"
-            },
-            body : JSON.stringify({
-                id : id
-            })
-        });
-    };
-}
-
-function stopServer(state) {
-    return function () {
-        //console.log("Ideally, end of the test");
-        return true;
-    };
-    // state.server.end();
-}
-
-describe("av-sched", function () {
-
-    it("can schedule cron jobs until ack arrives", function () {
-
-        var jobId = "test-job-" + new Date().getTime();
-
-        var secret = "secret";
-        var state = {
-            count : 0
-        };
-        return startListener(state,jobId,secret)()
-            .then(checkCalls(state, 0))
-            .then(scheduleJob(jobId, 2, secret))
-            .then(waitFor(2))
-            .then(checkCalls(state, 1))
-            .then(waitFor(2))
-            .then(checkCalls(state, 1))
-            .then(waitFor(2))
-            .then(checkCalls(state, 1))
-            .then(ackJob(jobId, secret))
-            .then(waitFor(2))
-            .then(checkCalls(state, 2))
-            .then(stopServer(state));
+            }))
+            .then(sched.waitFor(3))
+            .then(sched.checkHasJobState(jobId, {
+                scheduling : {
+                    type : "cron",
+                    value : "0/2 0/1 * 1/1 * ? *"
+                },
+                lock : {
+                    locked : true
+                }
+            }))
+            .then(sched.stopListener(state));
 
     });
+
+    it("can remove a scheduled job", function () {
+        sched.log("Testing removing a job...");
+
+        return sched.startListener(state, jobId, secret)()
+            .then(sched.checkCalls(state, 0, "0"))
+            .then(sched.scheduleJob(state, jobId, 5, secret))
+            .then(sched.unscheduleJob(state, jobId, secret))
+            .then(sched.waitFor(5))
+            .then(sched.checkCalls(state, 0, "1"))
+            .then(sched.stopListener(state));
+    });
+
+    it("can trigger job execution", function () {
+
+        sched.log("Testing triggering job exec");
+
+        return sched.startListener(state, jobId, secret)()
+            .then(sched.checkCalls(state, 0, "0 - before job scheduling"))
+            .then(sched.scheduleJob(state, jobId, 250000, secret))
+            .then(sched.checkCalls(state, 0, "1 - after job scheduling"))
+            .then(sched.triggerJob(jobId, secret, {
+                triggered : true
+            }))
+            .then(sched.waitFor(2))
+            .then(sched.checkCalls(state, 1, "2 - after job triggered once"))
+            .then(sched.triggerJob(jobId, secret, {
+                triggered : false
+            }))
+            .then(sched.waitFor(2))
+            .then(sched.checkCalls(state, 1, "3 - after failed job triggering"))
+            .then(sched.stopListener(state));
+    });
+
+    it("does not trigger unexisting job", function () {
+        return sched.triggerJob("prout", secret)().then(function () {
+            assert.fail(null, null, "Expected trigger call to fail");
+        }, function (err) {
+            assert.equal(err.response.statusCode, 500);
+            assert.deepEqual(err.response.body, {
+                error : "job.not.found",
+                params : ["prout"]
+            });
+        });
+    });
+
+    it("does not ack unexisting job", function () {
+        return sched.ackJob("prout", secret)().then(function () {
+            assert.fail(null, null, "Expected ack call to fail");
+        }, function (err) {
+            assert.equal(err.response.statusCode, 500);
+            assert.deepEqual(err.response.body, {
+                error : "job.not.found",
+                params : ["prout"]
+            });
+        });
+    });
+
 
 });
