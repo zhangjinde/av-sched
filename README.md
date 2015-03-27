@@ -2,8 +2,8 @@
 
 ## Work In Progress
 
-- The UI is not built in the JAR
-- The UI is minimalistic
+- Some API validation missing
+- Jobs are not "killed" if calling them fails too often
 
 ## Configuration
 
@@ -38,6 +38,8 @@ Database credentials. You should create the db and user yourself.
 
 ### Run server
 
+Database bootstrap and migrations are automatically run at application startup.
+
 #### From eclipse
 
 - `mvn eclipse:eclipse`
@@ -50,9 +52,13 @@ Database credentials. You should create the db and user yourself.
 - `export AVSCHED_CONF_DIR=/home/....`
 - `java -jar target/av-sched-x.y.z-exec.jar`
 
+### Options
+
+- `--clear` : clear data from MySql tables and Quartz scheduler (usefull for tests.)
+
 ## UI
 
-Go to `http://localhost:8086/sched/`
+Open `http://localhost:8086/sched/`.
 
 ## API
 
@@ -131,6 +137,10 @@ GET host:8086/sched/api/job
     "url" : "http://localhost:3030/test/test-job-1426783470991",
     "timeout" : 60000
   },
+  "scheduling" : {
+    "type" : "cron",
+    "value" : ".."
+  },
   "lock" : {
     "locked" : true,
     "expiresAt" : 1426783532000,
@@ -141,6 +151,10 @@ GET host:8086/sched/api/job
     "id" : "test-job-1426783460784",
     "url" : "http://localhost:3020/test/test-job-1426783460784",
     "timeout" : 60000
+   },
+  "scheduling" : {
+    "type" : "cron",
+    "value" : ".."
   },
   "lock" : {
     "locked" : true,
@@ -150,7 +164,29 @@ GET host:8086/sched/api/job
 } ]
 ~~~
 
-##
+### Get a single job
+
+~~~
+GET host:8086/sched/api/job?jobId=test-job-1426783470991
+[ {
+  "config" : {
+    "id" : "test-job-1426783470991",
+    "url" : "http://localhost:3030/test/test-job-1426783470991",
+    "timeout" : 60000
+  },
+  "scheduling" : {
+    "type" : "cron",
+    "value" : ".."
+  },
+  "lock" : {
+    "locked" : true,
+    "expiresAt" : 1426783532000,
+    "expired" : true
+  }
+} ]
+~~~
+
+
 
 ## Functionnal Tests
 
