@@ -48,7 +48,7 @@ JobStore.dispatchTocken = AppDispatcher.register(function (action) {
         break;
 
     case ActionTypes.JOB_DELETED:
-        _jobs = _jobs.deleteIn(action.jobId);
+        _jobs = _jobs.delete(action.jobId);
         JobStore.emitChange();
         break;
 

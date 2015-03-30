@@ -1,13 +1,33 @@
-import rp from "request-promise";
+// import rp from "request-promise";
 
+import xhr from "xhr";
 import SchedServerActionCreators from "../actions/schedServerActionCreators.js";
 
 // TODO(pht) find how to clean that up
 const SCHED_API_URL = "http://localhost:8086/sched/api";
 
+// The 'request promise' module seems to not be compilable anymore with
+// babel, so I use this small wrapper instead.
+function rp(options) {
+    return new Promise(function (resolve, reject) {
+        xhr(options, function (err, resp, body) {
+            if (err) {
+                reject(err);
+            } else {
+                if (resp.statusCode !== 200) {
+                    reject(resp);
+                } else {
+                    resolve(body);
+                }
+            }
+        });
+    });
+}
+
 var SchedApi = {
 
     fetch(jobId) {
+
         return rp({
             uri: SCHED_API_URL + "/job?jobId=" + jobId,
             method: "GET",
@@ -34,8 +54,7 @@ var SchedApi = {
         return rp({
             uri : SCHED_API_URL + "/job-def",
             method : "DELETE",
-            json : true,
-            body : {
+            json : {
                 id : jobId
             },
             headers : {
@@ -52,8 +71,7 @@ var SchedApi = {
         return rp({
             uri : SCHED_API_URL + "/job-action/ack",
             method : "POST",
-            json : true,
-            body : {
+            json : {
                 id : jobId
             },
             headers : {
@@ -71,8 +89,7 @@ var SchedApi = {
         return rp({
             uri : SCHED_API_URL + "/job-action/trigger",
             method : "POST",
-            json : true,
-            body : {
+            json : {
                 id : jobId
             },
             headers : {
@@ -85,8 +102,6 @@ var SchedApi = {
             SchedApi.fetch(jobId);
         });
     }
-
-
 
 };
 

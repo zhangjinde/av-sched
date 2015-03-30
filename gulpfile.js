@@ -15,13 +15,16 @@ gulp.task('dev', function() {
 
     b = watchify(b);
     b.on("update", function() {
-        bundle(b);
+        bundle(b, {
+            sourcemap : false,
+            uglify : false
+        });
     });
     b.on('log', util.log.bind(util));
     b.add("./src/main/es6/app.js");
 
     bundle(b, {
-        sourcemap : true,
+        sourcemap : false,
         uglify : false
     });
 });
@@ -30,7 +33,7 @@ gulp.task('build', function() {
     var b = getBrowserify();
     bundle(b, {
         sourcemap : false,
-        uglify : true
+        uglify : false
     });
 });
 
@@ -47,12 +50,10 @@ function getBrowserify() {
 }
 
 function bundle(b, options) {
-    var b = b.bundle()
+    b = b.bundle()
         .on('error', util.log.bind(util, 'Browserify Error'))
         .pipe(source('app.js'))
-
-    .pipe(buffer());
-
+        .pipe(buffer());
 
     if (options.sourcemap) {
         b = b.pipe(sourcemaps.init({
@@ -65,7 +66,6 @@ function bundle(b, options) {
             mangle: false
         }));
     }
-
 
     if (options.sourcemap) {
         b = b.pipe(sourcemaps.write('./'));
