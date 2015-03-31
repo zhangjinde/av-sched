@@ -104,7 +104,7 @@
                 } ],
                 "AccessLoggingPolicy": {
                     "S3BucketName": { "Ref": "S3LoggingBucket" },
-                    "S3BucketPrefix": "elb-access-logs/av-metrics",
+                    "S3BucketPrefix": "elb-access-logs/av-sched",
                     "Enabled": "true",
                     "EmitInterval" : "5"
                 }
