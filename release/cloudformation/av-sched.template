@@ -211,6 +211,9 @@
                                 " - name: av-keys.timer\n",
                                 "   command: start\n",
 
+                                " - name: av-log-s3-sync.timer\n",
+                                "   command: start\n",
+
                                 " - name: av-log.service\n",
                                 "   command: start\n",
 
