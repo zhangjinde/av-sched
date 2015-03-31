@@ -192,7 +192,7 @@
                 "SecurityGroups": [ { "Ref": "PrivateSecurityGroup" } ],
                 "IamInstanceProfile": { "Ref": "AvSchedInstanceProfile" },
                 "BlockDeviceMappings" : [ {
-                    "DeviceName" : "/dev/xvda",
+                    "DeviceName" : "/dev/sda1",
                     "Ebs" : { "VolumeSize" : "50", "VolumeType": "gp2" }
                 } ],
                 "UserData": {
