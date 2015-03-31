@@ -9,10 +9,9 @@ AV_REPO_URL=https://s3-eu-west-1.amazonaws.com/av-repo
 # Name of the repo where to upload the resources (artifact, template, ...)
 REPO_NAME=av-sched
 
-# Default values for EnvName, BaseAMI
+# Default values for EnvName
 declare -A DEFAULT_PARAMS
 DEFAULT_PARAMS[EnvName]=dev
-DEFAULT_PARAMS[BaseAMI]=ami-cbe87bbc
 
 # Configuration files located on AWS S3 buckets
 # The name of the configuration to be used is defined by the argument '--aws-cfg <ConfigName>'
@@ -21,10 +20,10 @@ declare -A AWS_S3_BUCKETS
 AWS_S3_BUCKETS[preprod]="s3://av-preprod-secrets/files/config/av-sched.cfg"
 
 # List of the network parameters to extract
-NETWORK_PARAMS_NAMES=( PrivateSubnetA PrivateSubnetB PrivateSubnetC PrivateSecurityGroup KeyPair EnvType )
+NETWORK_PARAMS_NAMES=( PrivateSubnetA PrivateSubnetB PrivateSubnetC PrivateSecurityGroup KeyPair EnvType S3LoggingBucket AlarmSNSTopic )
 
 # List of stack parameters (used in the help message)
-STACK_PARAMS_NAMES=( Version EnvName BaseAMI InstanceType DBUser DBPwd AvSchedSecret HealthCheckGracePeriod )
+STACK_PARAMS_NAMES=( Version EnvName InstanceType DBUser DBPwd AvSchedSecret HealthCheckGracePeriod )
 
 # List of secured stack parameters (used to hide the value of the parameters)
 SECURED_STACK_PARAMS_NAMES=( DBPwd AvSchedSecret )

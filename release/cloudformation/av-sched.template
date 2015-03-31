@@ -3,6 +3,13 @@
 
     "Description": "AirVantage Scheduling service",
 
+    "Mappings" : {
+       "CoreOsAmiMap" : {
+          "us-west-2" :         { "AMI" : "ami-cdd4f7fd" },
+          "eu-west-1" :         { "AMI" : "ami-2bd3495c" }
+        }
+    },
+
     "Parameters" : {
 
         "EnvName" :                 { "Type" : "String", "Description" : "from net stack" },
@@ -12,15 +19,12 @@
         "PrivateSubnetB" :          { "Type" : "String", "Description" : "from net stack" },
         "PrivateSubnetC" :          { "Type" : "String", "Description" : "from net stack" },
         "PrivateSecurityGroup" :    { "Type" : "String", "Description" : "from net stack" },
+        "S3LoggingBucket" :         { "Type" : "String", "Description" : "from net stack" },
+        "AlarmSNSTopic" :           { "Type" : "String", "Description" : "from net stack" },
 
         "Version" : {
             "Description" : "The version of the application: used to pull docker image.",
             "Type" : "String"
-        },
-
-        "BaseAMI": {
-            "Description" : "Base AMI used to launch av-sched",
-            "Type": "String"
         },
 
         "InstanceType" : {
@@ -97,7 +101,13 @@
                     "InstancePort": 8086,
                     "LoadBalancerPort": 80,
                     "Protocol": "HTTP"
-                } ]
+                } ],
+                "AccessLoggingPolicy": {
+                    "S3BucketName": { "Ref": "S3LoggingBucket" },
+                    "S3BucketPrefix": "elb-access-logs/av-metrics",
+                    "Enabled": "true",
+                    "EmitInterval" : "5"
+                }
             }
         },
 
@@ -176,7 +186,7 @@
         "AvSchedLaunchConfig": {
             "Type": "AWS::AutoScaling::LaunchConfiguration",
             "Properties": {
-                "ImageId": { "Ref" : "BaseAMI" },
+                "ImageId": { "Fn::FindInMap" : [ "CoreOsAmiMap", { "Ref" : "AWS::Region" }, "AMI" ]},
                 "InstanceType": { "Ref": "InstanceType" },
                 "KeyName": { "Ref": "KeyPair" },
                 "SecurityGroups": [ { "Ref": "PrivateSecurityGroup" } ],
