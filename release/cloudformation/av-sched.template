@@ -168,7 +168,13 @@
                         {
                             "Effect": "Allow",
                             "Action": [ "s3:Get*", "s3:List*" ],
-                            "Resource": "arn:aws:s3:::av-repo/*"
+                            "Resource": [ "arn:aws:s3:::av-repo/*", "arn:aws:s3:::av-repo" ]
+                        },
+                        {
+                            "Effect": "Allow",
+                            "Action": [ "s3:Get*", "s3:List*", "s3:Put*" ],
+                            "Resource": [ { "Fn::Join" : ["", [ "arn:aws:s3:::", { "Ref": "EnvName" }, "-", { "Ref": "EnvType" }, "-logs/*" ] ] },
+                                          { "Fn::Join" : ["", [ "arn:aws:s3:::", { "Ref": "EnvName" }, "-", { "Ref": "EnvType" }, "-logs" ] ] } ]
                         } ]
                     }
                } ]
