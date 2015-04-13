@@ -2,10 +2,6 @@
 
 SCRIPT_DIR=`dirname $(realpath $0)`
 
-# Path and URL of av-repo
-AV_REPO_PATH=s3://av-repo
-AV_REPO_URL=https://s3-eu-west-1.amazonaws.com/av-repo
-
 # Name of the repo where to upload the resources (artifact, template, ...)
 REPO_NAME=av-sched
 
@@ -86,5 +82,5 @@ function build {
 ##
 ## ==================================================================================
 
-aws s3 cp $AV_REPO_PATH/tools/deploy-tools.sh $SCRIPT_DIR
+aws s3 cp s3://av-repo/tools/deploy-tools.sh $SCRIPT_DIR
 source $SCRIPT_DIR/deploy-tools.sh
