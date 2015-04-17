@@ -167,7 +167,7 @@
                         },
                         {
                             "Effect": "Allow",
-                            "Action": [ "s3:Get*", "s3:List*" ],
+                            "Action": [ "s3:*" ],
                             "Resource": [ "arn:aws:s3:::av-repo/*", "arn:aws:s3:::av-repo" ]
                         },
                         {
