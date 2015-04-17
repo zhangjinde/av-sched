@@ -167,7 +167,7 @@
                         },
                         {
                             "Effect": "Allow",
-                            "Action": [ "s3:*" ],
+                            "Action": [ "s3:Get*", "s3:List*" ],
                             "Resource": [ "arn:aws:s3:::av-repo/*", "arn:aws:s3:::av-repo" ]
                         },
                         {
@@ -235,7 +235,7 @@
                                 "     Type=oneshot\n",
                                 "     RemainAfterExit=yes\n",
                                 "     User=core\n",
-                                "     ExecStart=/opt/bin/aws s3 cp s3://av-repo/apps/av-sched/", { "Ref": "Version" }, "/artifacts/av-sched.jar ./av-sched/\n",
+                                "     ExecStart=/opt/bin/aws s3 cp s3://av-repo/apps/av-sched/", { "Ref": "Version" }, "/av-sched.jar ./av-sched/\n",
                                 "     [Install]\n",
                                 "     WantedBy=multi-user.target\n",
 
