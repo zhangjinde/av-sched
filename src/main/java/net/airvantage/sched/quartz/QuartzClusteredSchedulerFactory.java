@@ -40,7 +40,7 @@ public class QuartzClusteredSchedulerFactory {
 
         // DB
         String jdbcUrl = "jdbc:mysql://" + config.getString("av-sched.db.server") + ":"
-                + config.getString("av-sched.db.port") + "/av_sched";
+                + config.getString("av-sched.db.port") + "/" + config.getString("av-sched.db.dbName");
         
         props.put("org.quartz.dataSource.sched.driver", Driver.class.getName());
         props.put("org.quartz.dataSource.sched.URL", jdbcUrl);
