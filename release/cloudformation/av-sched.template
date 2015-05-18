@@ -4,9 +4,9 @@
     "Description": "AirVantage Scheduling service",
 
     "Mappings" : {
-       "CoreOsAmiMap" : {
-          "us-west-2" :         { "AMI" : "ami-cdd4f7fd" },
-          "eu-west-1" :         { "AMI" : "ami-2bd3495c" }
+        "CoreOsAmiMap" : {
+            "us-west-2" :         { "AMI" : "ami-0bcffe3b" },
+            "eu-west-1" :         { "AMI" : "ami-790d640e" }
         }
     },
 
