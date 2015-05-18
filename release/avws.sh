@@ -10,6 +10,8 @@ REPO_NAME=av-sched
 # AWS_S3_BUCKETS[ConfigName]="s3://...""
 declare -A AWS_S3_BUCKETS
 AWS_S3_BUCKETS[preprod]="s3://av-preprod-secrets/files/config/av-sched.cfg"
+AWS_S3_BUCKETS[prodna]="s3://av-prod-secrets/files/config/av-sched-na.cfg"
+AWS_S3_BUCKETS[prodeu]="s3://av-prod-secrets/files/config/av-sched-eu.cfg"
 
 # List of the network parameters to extract
 NETWORK_PARAMS_NAMES=( PrivateSubnetA PrivateSubnetB PrivateSubnetC PrivateSecurityGroup KeyPair EnvType S3LoggingBucket AlarmSNSTopic )
@@ -22,10 +24,10 @@ SECURED_STACK_PARAMS_NAMES=( DBPwd AvSchedSecret )
 
 
 # ----------------------------------------------------------------------------------------
-# 
+#
 # Build all required artifacts for your application and upload them on S3.
 # This function is called when the command 'build' is used.
-# 
+#
 # ----------------------------------------------------------------------------------------
 
 function build {
@@ -44,11 +46,11 @@ function build {
 
 
 # ----------------------------------------------------------------------------------------
-# 
+#
 # Upload the artifacts to S3.
 # The variable 'VERSION' contains the version of the application to release.
 # This function is called when the command 'release' is used.
-# 
+#
 # ----------------------------------------------------------------------------------------
 
 function release {
@@ -64,12 +66,12 @@ function release {
 
 
 # ----------------------------------------------------------------------------------------
-# 
+#
 # Initialize the required variables to be used to deploy the stack.
 # The following variables need to be set: ENV_NAME NETWORK_STACK STACK_NAME.
 # The variable 'VERSION' contains the version of the application to deploy.
 # This function is called when the command 'deploy' is used.
-# 
+#
 # ----------------------------------------------------------------------------------------
 
 function prepare_deploy {
