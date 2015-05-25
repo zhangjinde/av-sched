@@ -46,8 +46,11 @@ public class QuartzClusteredSchedulerFactory {
         props.put("org.quartz.dataSource.sched.URL", jdbcUrl);
         props.put("org.quartz.dataSource.sched.user", config.getString("av-sched.db.user"));
         props.put("org.quartz.dataSource.sched.password", config.getString("av-sched.db.password"));
-        // ? props.put("org.quartz.jobStore.dataSource.sched.maxConnections", ?);
-        // ? props.put("org.quartz.jobStore.dataSource.sched.validationQuery", ?);
+        
+        // Attempt to fix https://github.com/AirVantage/av-sched/issues/6 
+        props.put("org.quartz.dataSource.sched.validationQuery", "SELECT 1");
+        props.put("org.quartz.dataSource.sched.validateOnCheckout", true);
+        
 
         schedFact.initialize(props);
         Scheduler scheduler = schedFact.getScheduler();

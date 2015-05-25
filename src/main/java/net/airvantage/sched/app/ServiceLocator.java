@@ -67,7 +67,6 @@ public class ServiceLocator {
                     new JobLockDaoImpl(dataSource),
                     new JobSchedulingDaoImpl(getScheduler()));
 
-            // jobStateDao = new DummyJobStateDao();
         }
         return jobStateDao;
     }
@@ -81,6 +80,9 @@ public class ServiceLocator {
             ds.setDatabaseName(config.getString(Keys.Db.DB_NAME));
             ds.setUser(config.getString(Keys.Db.USER));
             ds.setPassword(config.getString(Keys.Db.PASSWORD));
+            // Attempt to fix https://github.com/AirVantage/av-sched/issues/6
+            ds.setAutoReconnect(true);
+            
             dataSource = ds;
         }
         return dataSource;
