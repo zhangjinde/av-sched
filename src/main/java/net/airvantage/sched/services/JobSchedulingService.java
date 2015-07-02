@@ -1,0 +1,35 @@
+package net.airvantage.sched.services;
+
+import net.airvantage.sched.app.exceptions.AppException;
+import net.airvantage.sched.model.JobDef;
+import net.airvantage.sched.model.JobSchedulingType;
+
+import org.quartz.Job;
+
+/**
+ * Service to manage {@link Job} scheduling.
+ */
+public interface JobSchedulingService {
+
+    /**
+     * Schedule a new job. A job with the same id will be replaced.
+     */
+    void scheduleJob(JobDef jobDef) throws AppException;
+
+    /**
+     * Delete the scheduling configuration.
+     */
+    boolean unscheduleJob(String jobId) throws AppException;
+
+    /**
+     * Remove the lock of the given job if it exists. All the job configuration is deleted if the job is complete (no
+     * scheduling configuration). A job is complete when the scheduling configuration is applied and finished (a
+     * {@link JobSchedulingType#DATE} job has been executed, the end date expired, ...).
+     */
+    void ackJob(String jobId) throws AppException;
+
+    boolean triggerJob(String jobId) throws AppException;
+
+    void deleteJob() throws AppException;
+
+}

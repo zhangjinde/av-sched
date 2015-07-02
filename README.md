@@ -14,7 +14,6 @@ A template exist in the "conf" folder.
 ### Mandatory
 
 - `av-sched.secret` : secret string exchanged in all API calls. (See [Security](#security) )
-
 - `av-sched.db.server`
 - `av-sched.db.port`
 - `av-sched.db.dbName`
@@ -44,7 +43,7 @@ Database bootstrap and migrations are automatically run at application startup.
 
 - `mvn eclipse:eclipse`
 - setup AVSCHED_CONF_DIR variable in build conf
-- Run `SchedMain`
+- Run `Launcher`
 
 #### From jar
 
@@ -71,7 +70,7 @@ The application that implements the task should also check that this header has 
 
 Obviously, this secret should remain, *ahem*, [secret](http://uncyclopedia.wikia.com/wiki/Captain_Obvious).
 
-### Schedule a job
+### Schedule a CRON job
 
 ~~~
 POST host:8086/sched/api/job-def
@@ -83,7 +82,25 @@ POST host:8086/sched/api/job-def
   },
   "scheduling" : {
     "type" : "cron",
+    "startAt" : 1435579200000, 
     "value" : "0/30 0/1 * 1/1 * ? *"
+  }
+}
+~~~
+
+### Schedule a DATE job
+
+~~~
+POST host:8086/sched/api/job-def
+{
+  "config" : {
+   "id" : "av-server/timers",
+   "url" : "http://murphy:3000/echo",
+   "timeout" : 60000
+  },
+  "scheduling" : {
+    "type" : "date",
+    "startAt" : 1435579200000
   }
 }
 ~~~
@@ -136,7 +153,7 @@ Response:
 }
 ~~~
 
-A job that is locked (has been fired but not acknowledged yet will not be triggered.)
+A job that is locked (has been fired but not acknowledged yet) will not be triggered.
 
 ### List scheduled jobs
 
@@ -150,7 +167,8 @@ GET host:8086/sched/api/job
   },
   "scheduling" : {
     "type" : "cron",
-    "value" : ".."
+    "startAt" : 1435579200000,
+    "value" : "0/30 0/1 * 1/1 * ? *"
   },
   "lock" : {
     "locked" : true,
@@ -164,8 +182,8 @@ GET host:8086/sched/api/job
     "timeout" : 60000
    },
   "scheduling" : {
-    "type" : "cron",
-    "value" : ".."
+    "type" : "date",
+    "startAt" : 1435579200000
   },
   "lock" : {
     "locked" : true,
@@ -187,7 +205,8 @@ GET host:8086/sched/api/job?jobId=test-job-1426783470991
   },
   "scheduling" : {
     "type" : "cron",
-    "value" : ".."
+    "startAt" : 1435579200000,
+    "value" : "0/30 0/1 * 1/1 * ? *"
   },
   "lock" : {
     "locked" : true,
@@ -197,7 +216,20 @@ GET host:8086/sched/api/job?jobId=test-job-1426783470991
 } ]
 ~~~
 
+### Callback
 
+~~~
+POST localhost:3030/test/test-job-1426783470991
+~~~
+
+Response (information can be returned by the callback) :
+
+~~~
+{
+  "ack" : true,
+  "retry" : 1435579200000
+}
+~~~
 
 ## Functionnal Tests
 

@@ -23,7 +23,7 @@ describe("av-sched", function() {
 
         sched.log("Testing job ack...");
 
-        return sched.startListener(state, jobId, secret)()
+        return sched.startListener(state, jobId, secret, {})()
             .then(sched.checkCalls(state, 0, "0"))
             .then(sched.scheduleJob(state, jobId, 2, secret))
             .then(sched.waitFor(4))
@@ -35,8 +35,78 @@ describe("av-sched", function() {
             .then(sched.ackJob(jobId, secret))
             .then(sched.waitFor(2))
             .then(sched.checkCalls(state, 2, "4"))
+            .then(sched.unscheduleJob(state, jobId, secret, {
+                id : jobId,
+                deleted : true
+            }))
+            .then(sched.waitFor(2))
             .then(sched.stopListener(state));
-
+    });
+    
+    it("executes acknowledged date job only one time", function() {
+    	
+        return sched.startListener(state, jobId, secret, {})()
+            .then(sched.checkCalls(state, 0, "0"))
+            
+            .then(sched.wakeupJob(state, jobId, Date.now() + 2000, 10000, secret))
+            
+            .then(sched.waitFor(3))
+            .then(sched.checkCalls(state, 1, "1"))
+            .then(sched.waitFor(4))
+            .then(sched.checkCalls(state, 1, "2"))
+            .then(sched.ackJob(jobId, secret))
+            .then(sched.waitFor(5))
+            .then(sched.checkCalls(state, 1, "3"))
+            .then(sched.unscheduleJob(state, jobId, secret, {
+                id : jobId,
+                deleted : false
+            }))
+            .then(sched.stopListener(state));
+    });
+    
+    it("does retry to execute an unacknowledged date job", function() {
+    	
+        return sched.startListener(state, jobId, secret, {})()
+            .then(sched.checkCalls(state, 0, "0"))
+            
+            .then(sched.wakeupJob(state, jobId, Date.now() + 2000, 5000, secret))
+            
+            .then(sched.waitFor(3))
+            .then(sched.checkCalls(state, 1, "1"))
+            .then(sched.waitFor(2))
+            .then(sched.checkCalls(state, 1, "2"))
+            .then(sched.waitFor(4))
+            .then(sched.checkCalls(state, 2, "3"))
+            .then(sched.ackJob(jobId, secret))
+            .then(sched.waitFor(5))
+            .then(sched.checkCalls(state, 2, "4"))
+            .then(sched.unscheduleJob(state, jobId, secret, {
+                id : jobId,
+                deleted : false
+            }))
+            .then(sched.stopListener(state));
+    });
+    
+    it("doesn't retry to executed an auto-acknowledged date job", function() {
+    	
+        return sched.startListener(state, jobId, secret, {"ack": true})()
+            .then(sched.checkCalls(state, 0, "0"))
+            
+            .then(sched.wakeupJob(state, jobId, Date.now() + 2000, 5000, secret))
+            
+            .then(sched.waitFor(3))
+            .then(sched.checkCalls(state, 1, "1"))
+            .then(sched.waitFor(2))
+            .then(sched.checkCalls(state, 1, "2"))
+            .then(sched.waitFor(2))
+            .then(sched.checkCalls(state, 1, "3"))
+            .then(sched.waitFor(2))
+            .then(sched.checkCalls(state, 1, "4"))
+            .then(sched.unscheduleJob(state, jobId, secret, {
+                id : jobId,
+                deleted : false
+            }))
+            .then(sched.stopListener(state));
     });
 
     it("can retrieve a single job", function () {
@@ -45,32 +115,37 @@ describe("av-sched", function() {
                 return sched.getJob("test-query-single");
             })
             .then(function (jobs) {
-                assert.deepEqual([{
-                    config : {
+            	
+                assert.deepEqual({
                         id : "test-query-single",
                         url : "http://localhost:" + state.port + "/test/test-query-single",
                         timeout : 60000
-                    },
-                    scheduling : {
-                        type : "cron",
-                        value : "0/5 0/1 * 1/1 * ? *"
-                    },
-                    lock : {
+                    }, jobs[0].config);
+            	
+                assert.deepEqual({
                         expired : false,
                         locked : false,
                         expiresAt : null
-                    }
-                }], jobs);
-            });
+                    }, jobs[0].lock);
+            	
+                assert.equal("cron", jobs[0].scheduling.type);
+                assert.equal("0/5 0/1 * 1/1 * ? *", jobs[0].scheduling.value);
+                assert.notEqual(null, jobs[0].scheduling.startAt);
+            })
+            .then(sched.unscheduleJob(state, "test-query-single", secret, {
+                id : "test-query-single",
+                deleted : true
+            }));
     });
 
     it("can list jobs", function() {
 
         sched.log("Testing list of jobs...");
 
-        return sched.startListener(state, jobId, secret)()
+        return sched.startListener(state, jobId, secret, {})()
             .then(sched.checkHasNoJobState(jobId))
             .then(sched.scheduleJob(state, jobId, 2, secret))
+            
             .then(sched.checkHasJobState(jobId, {
                 scheduling : {
                     type : "cron",
@@ -90,6 +165,11 @@ describe("av-sched", function() {
                     locked : true
                 }
             }))
+            .then(sched.unscheduleJob(state, jobId, secret, {
+                id : jobId,
+                deleted : true
+            }))
+            .then(sched.waitFor(2))
             .then(sched.stopListener(state));
 
     });
@@ -97,7 +177,7 @@ describe("av-sched", function() {
     it("can remove a scheduled job", function () {
         sched.log("Testing removing a job...");
 
-        return sched.startListener(state, jobId, secret)()
+        return sched.startListener(state, jobId, secret, {})()
             .then(sched.checkCalls(state, 0, "0"))
             .then(sched.scheduleJob(state, jobId, 5, secret))
             .then(sched.unscheduleJob(state, jobId, secret, {
@@ -120,7 +200,7 @@ describe("av-sched", function() {
 
         sched.log("Testing triggering job exec");
 
-        return sched.startListener(state, jobId, secret)()
+        return sched.startListener(state, jobId, secret, {})()
             .then(sched.checkCalls(state, 0, "0 - before job scheduling"))
             .then(sched.scheduleJob(state, jobId, 250000, secret))
             .then(sched.checkCalls(state, 0, "1 - after job scheduling"))
@@ -134,6 +214,10 @@ describe("av-sched", function() {
             }))
             .then(sched.waitFor(2))
             .then(sched.checkCalls(state, 1, "3 - after failed job triggering"))
+            .then(sched.unscheduleJob(state, jobId, secret, {
+                id : jobId,
+                deleted : true
+            }))
             .then(sched.stopListener(state));
     });
 
@@ -160,6 +244,5 @@ describe("av-sched", function() {
             });
         });
     });
-
 
 });
