@@ -197,7 +197,7 @@
                 "Namespace": "AWS/ELB",
                 "Statistic": "Average",
                 "Period": "300",
-                "EvaluationPeriods": "2",
+                "EvaluationPeriods": "3",
                 "Threshold": "0.25",
                 "AlarmActions": [ { "Ref": "AlarmSNSTopic" } ],
                 "Dimensions": [
