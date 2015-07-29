@@ -5,8 +5,8 @@
 
     "Mappings" : {
         "CoreOsAmiMap" : {
-            "us-west-2" :         { "AMI" : "ami-66441011" },
-            "eu-west-1" :         { "AMI" : "ami-c55c52f5" }
+            "us-west-2" :         { "AMI" : "ami-c55c52f5" },
+            "eu-west-1" :         { "AMI" : "ami-66441011" }
         }
     },
 

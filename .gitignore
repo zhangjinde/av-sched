@@ -6,4 +6,4 @@ node_modules
 release/avws-tools.sh
 src/main/webapp/public/bower
 src/main/webapp/public/dist
-aws/*.cfg
+aws
