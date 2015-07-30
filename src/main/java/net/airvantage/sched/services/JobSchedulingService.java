@@ -2,6 +2,7 @@ package net.airvantage.sched.services;
 
 import net.airvantage.sched.app.exceptions.AppException;
 import net.airvantage.sched.model.JobDef;
+import net.airvantage.sched.model.JobScheduling;
 import net.airvantage.sched.model.JobSchedulingType;
 
 import org.quartz.Job;
@@ -17,6 +18,11 @@ public interface JobSchedulingService {
     void scheduleJob(JobDef jobDef) throws AppException;
 
     /**
+     * Re-schedule an existing job. A trigger with the same key should exist to be replaced.
+     */
+    void rescheduleJob(String jobId, JobScheduling conf) throws AppException;
+
+    /**
      * Delete the scheduling configuration.
      */
     boolean unscheduleJob(String jobId) throws AppException;
@@ -30,6 +36,6 @@ public interface JobSchedulingService {
 
     boolean triggerJob(String jobId) throws AppException;
 
-    void deleteJob() throws AppException;
+    void clearJobs() throws AppException;
 
 }

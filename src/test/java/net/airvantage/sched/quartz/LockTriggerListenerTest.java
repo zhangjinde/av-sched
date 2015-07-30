@@ -18,7 +18,7 @@ import org.quartz.Trigger;
 
 public class LockTriggerListenerTest {
 
-    private LockTriggerListener service;
+    private DefaultTriggerListener service;
 
     @Mock
     private JobStateService jobStateService;
@@ -26,7 +26,7 @@ public class LockTriggerListenerTest {
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        service = new LockTriggerListener(jobStateService);
+        service = new DefaultTriggerListener(jobStateService);
     }
 
     @Test

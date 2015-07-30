@@ -7,14 +7,16 @@ import net.airvantage.sched.app.exceptions.AppException;
 import net.airvantage.sched.dao.JobConfigDao;
 import net.airvantage.sched.dao.JobLockDao;
 import net.airvantage.sched.dao.JobSchedulingDao;
+import net.airvantage.sched.dao.JobWakeupDao;
 import net.airvantage.sched.model.JobConfig;
 import net.airvantage.sched.model.JobDef;
 import net.airvantage.sched.model.JobScheduling;
-import net.airvantage.sched.quartz.job.PostHttpJob;
+import net.airvantage.sched.quartz.job.CronJob;
 import net.airvantage.sched.services.impl.JobSchedulingServiceImpl;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
@@ -27,6 +29,7 @@ import org.quartz.SimpleScheduleBuilder;
 import org.quartz.Trigger;
 import org.quartz.TriggerKey;
 
+@Ignore
 public class JobSchedulingServiceImplTest {
 
     private JobSchedulingServiceImpl service;
@@ -46,11 +49,15 @@ public class JobSchedulingServiceImplTest {
     @Mock
     private JobSchedulingDao jobSchedulingDao;
 
+    @Mock
+    private JobWakeupDao jobWakeupDao;
+
     @Before
     public void setUp() {
 
         MockitoAnnotations.initMocks(this);
-        service = new JobSchedulingServiceImpl(scheduler, jobStateService, jobConfigDao, jobLockDao, jobSchedulingDao);
+        service = new JobSchedulingServiceImpl(scheduler, jobStateService, jobConfigDao, jobLockDao, jobSchedulingDao,
+                jobWakeupDao);
     }
 
     @Test
@@ -76,7 +83,7 @@ public class JobSchedulingServiceImplTest {
         Mockito.verify(this.scheduler).scheduleJob(triggerCaptor.capture());
 
         JobDetail detail = detailCaptor.getValue();
-        Assert.assertEquals(PostHttpJob.class, detail.getJobClass());
+        Assert.assertEquals(CronJob.class, detail.getJobClass());
         Assert.assertEquals(jobId, detail.getKey().getName());
 
         Trigger trigger = triggerCaptor.getValue();
@@ -92,7 +99,7 @@ public class JobSchedulingServiceImplTest {
         String jobId = "jobid";
         long startAt = System.currentTimeMillis();
 
-        JobDef jobDef = TestUtils.dateJobDef(jobId, startAt);
+        JobDef jobDef = TestUtils.wakeupJobDef(jobId, startAt);
 
         // RUN
 
@@ -104,12 +111,12 @@ public class JobSchedulingServiceImplTest {
 
         ArgumentCaptor<JobDetail> detailCaptor = ArgumentCaptor.forClass(JobDetail.class);
         Mockito.verify(this.scheduler).addJob(detailCaptor.capture(), Mockito.eq(true));
-        
+
         ArgumentCaptor<Trigger> triggerCaptor = ArgumentCaptor.forClass(Trigger.class);
         Mockito.verify(this.scheduler).scheduleJob(triggerCaptor.capture());
 
         JobDetail detail = detailCaptor.getValue();
-        Assert.assertEquals(PostHttpJob.class, detail.getJobClass());
+        Assert.assertEquals(CronJob.class, detail.getJobClass());
         Assert.assertEquals(jobId, detail.getKey().getName());
 
         Trigger trigger = triggerCaptor.getValue();
@@ -126,10 +133,10 @@ public class JobSchedulingServiceImplTest {
         String jobId = "jobid";
         long startAt = System.currentTimeMillis();
 
-        JobDef jobDef = TestUtils.dateJobDef(jobId, startAt);
-        
+        JobDef jobDef = TestUtils.wakeupJobDef(jobId, startAt);
+
         // MOCK
-        
+
         Mockito.when(scheduler.checkExists(Mockito.any(TriggerKey.class))).thenReturn(true);
 
         // RUN
@@ -142,12 +149,12 @@ public class JobSchedulingServiceImplTest {
 
         ArgumentCaptor<JobDetail> detailCaptor = ArgumentCaptor.forClass(JobDetail.class);
         Mockito.verify(this.scheduler).addJob(detailCaptor.capture(), Mockito.eq(true));
-        
+
         ArgumentCaptor<Trigger> triggerCaptor = ArgumentCaptor.forClass(Trigger.class);
         Mockito.verify(this.scheduler).rescheduleJob(Mockito.any(TriggerKey.class), triggerCaptor.capture());
 
         JobDetail detail = detailCaptor.getValue();
-        Assert.assertEquals(PostHttpJob.class, detail.getJobClass());
+        Assert.assertEquals(CronJob.class, detail.getJobClass());
         Assert.assertEquals(jobId, detail.getKey().getName());
 
         Trigger trigger = triggerCaptor.getValue();

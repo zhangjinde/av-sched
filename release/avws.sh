@@ -12,12 +12,13 @@ declare -A AWS_S3_BUCKETS
 AWS_S3_BUCKETS[preprod]="s3://av-preprod-secrets/files/config/av-sched.cfg"
 AWS_S3_BUCKETS[prodna]="s3://av-prod-secrets/files/config/av-sched-na.cfg"
 AWS_S3_BUCKETS[prodeu]="s3://av-prod-secrets/files/config/av-sched-eu.cfg"
+AWS_S3_BUCKETS[perf]="s3://av-preprod-secrets/files/config/av-sched-perf.cfg"
 
 # List of the network parameters to extract
 NETWORK_PARAMS_NAMES=( PrivateSubnetA PrivateSubnetB PrivateSubnetC PrivateSecurityGroup KeyPair EnvType S3LoggingBucket AlarmSNSTopic )
 
 # List of stack parameters (used in the help message)
-STACK_PARAMS_NAMES=( Version EnvName InstanceType DBUser DBPwd AvSchedSecret HealthCheckGracePeriod )
+STACK_PARAMS_NAMES=( Version EnvName InstanceType InstanceNumber DBUser DBPwd AvSchedSecret HealthCheckGracePeriod )
 
 # List of secured stack parameters (used to hide the value of the parameters)
 SECURED_STACK_PARAMS_NAMES=( DBPwd AvSchedSecret )

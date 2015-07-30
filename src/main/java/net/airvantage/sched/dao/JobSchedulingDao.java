@@ -91,8 +91,6 @@ public class JobSchedulingDao {
             CronTriggerImpl cronTrigger = (CronTriggerImpl) trigger;
             sched.setValue(cronTrigger.getCronExpression());
 
-        } else {
-            sched.setType(JobSchedulingType.DATE);
         }
 
         return new JobSchedulingWithId(jobId, sched);
